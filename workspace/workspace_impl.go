@@ -127,3 +127,7 @@ func (w *Workspace) Connect(ctx context.Context, userName string, stdin io.Reade
 	err = <-outputErr
 	return nil
 }
+
+func (*Workspace) Remove(ctx context.Context, userName string) error {
+	return nil
+}

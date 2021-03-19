@@ -12,6 +12,10 @@ import (
 
 type User struct{}
 
+func NewUser() *User {
+	return &User{}
+}
+
 func (*User) Create(ctx context.Context, user *domain.User) error {
 	txn, err := getTransaction(ctx)
 	if err != nil {

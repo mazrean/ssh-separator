@@ -10,6 +10,10 @@ import (
 
 type Transaction struct{}
 
+func NewTransaction() *Transaction {
+	return &Transaction{}
+}
+
 const (
 	transactionKey = "transaction"
 )

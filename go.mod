@@ -14,6 +14,7 @@ require (
 	github.com/gliderlabs/ssh v0.3.2
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/google/wire v0.5.0
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/labstack/echo/v4 v4.2.1
 	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 // indirect

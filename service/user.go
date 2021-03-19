@@ -19,6 +19,14 @@ type User struct {
 	repository.ITransaction
 }
 
+func NewUser(w workspace.IWorkspace, ru repository.IUser, t repository.ITransaction) *User {
+	return &User{
+		IWorkspace:   w,
+		IUser:        ru,
+		ITransaction: t,
+	}
+}
+
 var (
 	ErrUserExist      = errors.New("user exist")
 	ErrWorkspaceExist = errors.New("workspace exist")

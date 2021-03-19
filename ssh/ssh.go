@@ -13,7 +13,7 @@ type SSH struct {
 	*service.User
 }
 
-func NewSSH(user *service.User) {
+func NewSSH(user *service.User) *SSH {
 	ssh.PasswordAuth(func(ctx ssh.Context, password string) bool {
 		isOK, err := user.SSHAuth(ctx, &domain.User{
 			Name:     ctx.User(),
@@ -33,6 +33,10 @@ func NewSSH(user *service.User) {
 			return
 		}
 	})
+
+	return &SSH{
+		User: user,
+	}
 }
 
 func (*SSH) Start(port int) error {

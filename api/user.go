@@ -16,8 +16,9 @@ type User struct {
 	*validator.Validate
 }
 
-func NewUser() *User {
+func NewUser(u *service.User) *User {
 	return &User{
+		User:     u,
 		Validate: validator.New(),
 	}
 }

@@ -3,5 +3,6 @@ package repository
 import "context"
 
 type ITransaction interface {
-	Transaction(func(ctx context.Context) error) error
+	Transaction(context.Context, func(ctx context.Context) error) error
+	RTransaction(context.Context, func(ctx context.Context) error) error
 }

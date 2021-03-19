@@ -32,7 +32,7 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 
 	user.Password = string(hashedPassword)
 
-	err = u.ITransaction.Transaction(func(ctx context.Context) error {
+	err = u.ITransaction.Transaction(ctx, func(ctx context.Context) error {
 		err := u.IUser.Create(ctx, user)
 		if err != nil {
 			return fmt.Errorf("create user error: %w", err)

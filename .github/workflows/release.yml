@@ -15,8 +15,6 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
-      - name: Set IMAGE_TAG env
-        run: echo "IMAGE_TAG=$(echo ${GITHUB_REF:11})" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Build and Push
         uses: docker/build-push-action@v1
@@ -25,4 +23,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: mazrean/separated-webshell
-          tags: $IMAGE_TAG
+          tags: ${GITHUB_REF:11}

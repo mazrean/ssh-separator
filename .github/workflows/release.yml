@@ -23,7 +23,7 @@ jobs:
       - name: Build Image
         run: docker build -t docker.pkg.github.com/mazrean/separated-webshell/${IMAGE_NAME}:${IMAGE_TAG} .
       - name: Push image to GitHub Registry
-        run: docker push docker.pkg.github.com/mazrean/separated-webshell${IMAGE_NAME}:${IMAGE_TAG}
+        run: docker push docker.pkg.github.com/mazrean/separated-webshell/${IMAGE_NAME}:${IMAGE_TAG}
       - name: Push image to GitHub Registry (latest)
         run: |
           docker tag docker.pkg.github.com/mazrean/separated-webshell/${IMAGE_NAME}:$IMAGE_TAG docker.pkg.github.com/mazrean/separated-webshell/${IMAGE_NAME}:latest

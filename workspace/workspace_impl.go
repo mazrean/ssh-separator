@@ -8,10 +8,12 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/errdefs"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/mazrean/separated-webshell/domain"
 )
@@ -25,6 +27,7 @@ var (
 		Stream: true,
 	}
 	containerMap = sync.Map{}
+	stopTimeout  = 10 * time.Second
 )
 
 type containerInfo struct {
@@ -47,6 +50,7 @@ func NewWorkspace() (*Workspace, error) {
 	}
 
 	ctx := context.Background()
+
 	reader, err := cli.ImagePull(ctx, imageRef, types.ImagePullOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to pull image: %w", err)
@@ -59,6 +63,7 @@ func NewWorkspace() (*Workspace, error) {
 }
 
 func (w *Workspace) Create(ctx context.Context, userName string) error {
+	ctnName := containerName(userName)
 	res, err := w.cli.ContainerCreate(ctx, &container.Config{
 		Image:        imageRef,
 		Tty:          true,
@@ -68,7 +73,20 @@ func (w *Workspace) Create(ctx context.Context, userName string) error {
 		AttachStdout: true,
 		StdinOnce:    true,
 		Volumes:      make(map[string]struct{}),
-	}, nil, nil, nil, containerName(userName))
+	}, nil, nil, nil, ctnName)
+	if errdefs.IsConflict(err) {
+		ctnInfo, err := w.cli.ContainerInspect(ctx, ctnName)
+		if err != nil {
+			return fmt.Errorf("failed to inspect container: %w", err)
+		}
+
+		containerMap.Store(userName, &containerInfo{
+			id:         ctnInfo.ID,
+			manageChan: make(chan struct{}, 20),
+		})
+
+		return nil
+	}
 	if err != nil {
 		return fmt.Errorf("failed to create container: %w", err)
 	}
@@ -96,9 +114,10 @@ func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, wi
 	}
 
 	err := w.cli.ContainerStart(ctx, ctnInfo.id, types.ContainerStartOptions{})
-	if err != nil {
+	if err != nil && !errdefs.IsConflict(err) {
 		return fmt.Errorf("failed to start container: %w", err)
 	}
+
 	if isTty {
 		go func() {
 			for win := range winCh {
@@ -115,9 +134,15 @@ func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, wi
 	}
 
 	ctnInfo.manageChan <- struct{}{}
-	defer func() {
+	defer func(ctx context.Context, ctnInfo *containerInfo) {
 		<-ctnInfo.manageChan
-	}()
+		if len(ctnInfo.manageChan) == 0 {
+			err := w.cli.ContainerStop(ctx, ctnInfo.id, &stopTimeout)
+			if err != nil {
+				log.Fatalf("failed to stop container:%+v", err)
+			}
+		}
+	}(ctx, ctnInfo)
 
 	stream, err := w.cli.ContainerAttach(ctx, ctnInfo.id, opts)
 	if err != nil {

@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*.*.*
+    branches-ignore:
+      - '**'
+
+env:
+  IMAGE_NAME: separated-webshell
+
+jobs:
+  image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and Push
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: mazrean/separated-webshell

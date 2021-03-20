@@ -13,6 +13,7 @@ RUN \
   git \
   python3 \
   python3-pip \
+  sudo \
   libtiff5-dev \
   libjpeg8-dev \
   libopenjp2-7-dev \
@@ -52,3 +53,7 @@ RUN wget https://github.com/longld/peda/archive/refs/tags/v1.2.tar.gz && \
   tar xvzf v1.2.tar.gz -C ~/peda && \
   rm v1.2.tar.gz
 RUN echo "source ~/peda/peda.py" >> ~/.gdbinit
+
+RUN useradd -m --uid 1000 --groups sudo ubuntu && \
+  echo 'ubuntu:ubuntu' | chpasswd
+RUN echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers

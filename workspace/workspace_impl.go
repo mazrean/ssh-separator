@@ -19,8 +19,9 @@ import (
 )
 
 var (
-	imageRef string = os.Getenv("IMAGE_URL")
-	opts            = types.ContainerAttachOptions{
+	imageRef  string = os.Getenv("IMAGE_URL")
+	imageUser string = os.Getenv("IMAGE_USER")
+	opts             = types.ContainerAttachOptions{
 		Stdin:  true,
 		Stdout: true,
 		Stderr: true,
@@ -66,6 +67,7 @@ func (w *Workspace) Create(ctx context.Context, userName string) error {
 	ctnName := containerName(userName)
 	res, err := w.cli.ContainerCreate(ctx, &container.Config{
 		Image:        imageRef,
+		User:         imageUser,
 		Tty:          true,
 		OpenStdin:    true,
 		AttachStderr: true,

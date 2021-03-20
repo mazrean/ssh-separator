@@ -25,4 +25,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: mazrean/separated-webshell
-          tags: separated-webshell:$IMAGE_TAG
+          tags: $IMAGE_TAG

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"sync"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/mazrean/separated-webshell/domain"
 )
 
 var (
@@ -47,6 +49,9 @@ func NewWorkspace() (*Workspace, error) {
 
 	ctx := context.Background()
 	reader, err := cli.ImagePull(ctx, imageRef, types.ImagePullOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to pull image: %w", err)
+	}
 	io.Copy(os.Stdout, reader)
 
 	return &Workspace{
@@ -57,6 +62,7 @@ func NewWorkspace() (*Workspace, error) {
 func (w *Workspace) Create(ctx context.Context, userName string) error {
 	res, err := w.cli.ContainerCreate(ctx, &container.Config{
 		Image:        imageRef,
+		Tty:          true,
 		OpenStdin:    true,
 		AttachStderr: true,
 		AttachStdin:  true,
@@ -76,7 +82,7 @@ func (w *Workspace) Create(ctx context.Context, userName string) error {
 	return nil
 }
 
-func (w *Workspace) Connect(ctx context.Context, userName string, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 	iContainerInfo, ok := containerMap.Load(userName)
 	if !ok {
 		return errors.New("load container info error")
@@ -94,6 +100,20 @@ func (w *Workspace) Connect(ctx context.Context, userName string, stdin io.Reade
 	if err != nil {
 		return fmt.Errorf("failed to start container: %w", err)
 	}
+	if isTty {
+		go func() {
+			for win := range winCh {
+				err := w.cli.ContainerResize(ctx, ctnInfo.id, types.ResizeOptions{
+					Height: win.Height,
+					Width:  win.Width,
+				})
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}()
+	}
 
 	ctnInfo.manageChan <- struct{}{}
 	defer func() {
@@ -109,7 +129,12 @@ func (w *Workspace) Connect(ctx context.Context, userName string, stdin io.Reade
 	outputErr := make(chan error)
 
 	go func() {
-		_, err := stdcopy.StdCopy(stdout, stderr, stream.Reader)
+		var err error
+		if isTty {
+			_, err = io.Copy(stdout, stream.Reader)
+		} else {
+			_, err = stdcopy.StdCopy(stdout, stderr, stream.Reader)
+		}
 		outputErr <- err
 	}()
 

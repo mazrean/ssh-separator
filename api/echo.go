@@ -20,6 +20,7 @@ func NewAPI(user *User) *API {
 func (api *API) Start(port int) error {
 	e := echo.New()
 
+	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	e.POST("/new", api.User.PostNewUser)

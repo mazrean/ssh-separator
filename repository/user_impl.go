@@ -47,12 +47,19 @@ func (*User) GetPassword(ctx context.Context, userName string) (string, error) {
 		return "", errors.New("no transaction")
 	}
 
-	password, err := txn.Get([]byte(userName))
+	item, err := txn.Get([]byte(userName))
 	if err != nil {
 		return "", fmt.Errorf("failed to get password: %w", err)
 	}
 
-	return string(password.Key()), nil
+	var password string
+	item.Value(func(val []byte) error {
+		password = string(val)
+
+		return nil
+	})
+
+	return password, nil
 }
 
 func (*User) GetAllUser(ctx context.Context) ([]string, error) {

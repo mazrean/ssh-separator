@@ -16,29 +16,25 @@ import (
 
 // Injectors from wire.go:
 
-func InjectAPIServer() (*api.API, error) {
+func InjectServer() (*Server, error) {
 	workspaceWorkspace, err := workspace.NewWorkspace()
 	if err != nil {
 		return nil, err
 	}
 	user := repository.NewUser()
 	transaction := repository.NewTransaction()
-	serviceUser := service.NewUser(workspaceWorkspace, user, transaction)
+	serviceUser, err := service.NewUser(workspaceWorkspace, user, transaction)
+	if err != nil {
+		return nil, err
+	}
 	apiUser := api.NewUser(serviceUser)
 	apiAPI := api.NewAPI(apiUser)
-	return apiAPI, nil
-}
-
-func InjectSSHServer() (*ssh.SSH, error) {
-	workspaceWorkspace, err := workspace.NewWorkspace()
+	sshSSH := ssh.NewSSH(serviceUser)
+	server, err := NewServer(apiAPI, sshSSH)
 	if err != nil {
 		return nil, err
 	}
-	user := repository.NewUser()
-	transaction := repository.NewTransaction()
-	serviceUser := service.NewUser(workspaceWorkspace, user, transaction)
-	sshSSH := ssh.NewSSH(serviceUser)
-	return sshSSH, nil
+	return server, nil
 }
 
 // wire.go:
@@ -48,3 +44,15 @@ var (
 	repositoryUserBind = wire.Bind(new(repository.IUser), new(*repository.User))
 	workspaceBind      = wire.Bind(new(workspace.IWorkspace), new(*workspace.Workspace))
 )
+
+type Server struct {
+	*api.API
+	*ssh.SSH
+}
+
+func NewServer(a *api.API, s *ssh.SSH) (*Server, error) {
+	return &Server{
+		API: a,
+		SSH: s,
+	}, nil
+}

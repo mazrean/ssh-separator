@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"io"
+
+	"github.com/mazrean/separated-webshell/domain"
 )
 
 var (
@@ -12,6 +14,6 @@ var (
 
 type IWorkspace interface {
 	Create(ctx context.Context, userName string) error
-	Connect(ctx context.Context, userName string, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
+	Connect(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
 	Remove(ctx context.Context, userName string) error
 }

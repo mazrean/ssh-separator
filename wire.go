@@ -17,27 +17,23 @@ var (
 	workspaceBind      = wire.Bind(new(workspace.IWorkspace), new(*workspace.Workspace))
 )
 
-func InjectAPIServer() (*api.API, error) {
-	wire.Build(
-		api.NewAPI,
-		api.NewUser,
-		repository.NewTransaction,
-		repository.NewUser,
-		service.NewUser,
-		//ssh.NewSSH,
-		workspace.NewWorkspace,
-		transactionBind,
-		repositoryUserBind,
-		workspaceBind,
-	)
-
-	return nil, nil
+type Server struct {
+	*api.API
+	*ssh.SSH
 }
 
-func InjectSSHServer() (*ssh.SSH, error) {
+func NewServer(a *api.API, s *ssh.SSH) (*Server, error) {
+	return &Server{
+		API: a,
+		SSH: s,
+	}, nil
+}
+
+func InjectServer() (*Server, error) {
 	wire.Build(
-		//api.NewAPI,
-		//api.NewUser,
+		NewServer,
+		api.NewAPI,
+		api.NewUser,
 		repository.NewTransaction,
 		repository.NewUser,
 		service.NewUser,

@@ -11,7 +11,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/mazrean/separated-webshell/domain"
@@ -69,7 +68,7 @@ func (w *Workspace) Create(ctx context.Context, userName string) error {
 		AttachStdout: true,
 		StdinOnce:    true,
 		Volumes:      make(map[string]struct{}),
-	}, nil, &network.NetworkingConfig{}, nil, containerName(userName))
+	}, nil, nil, nil, containerName(userName))
 	if err != nil {
 		return fmt.Errorf("failed to create container: %w", err)
 	}

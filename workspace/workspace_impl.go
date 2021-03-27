@@ -136,15 +136,16 @@ func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, wi
 	}
 
 	ctnInfo.manageChan <- struct{}{}
-	defer func(ctx context.Context, ctnInfo *containerInfo) {
+	defer func(ctnInfo *containerInfo) {
 		<-ctnInfo.manageChan
 		if len(ctnInfo.manageChan) == 0 {
+			ctx := context.Background()
 			err := w.cli.ContainerStop(ctx, ctnInfo.id, &stopTimeout)
 			if err != nil {
 				log.Fatalf("failed to stop container:%+v", err)
 			}
 		}
-	}(ctx, ctnInfo)
+	}(ctnInfo)
 
 	stream, err := w.cli.ContainerAttach(ctx, ctnInfo.id, opts)
 	if err != nil {

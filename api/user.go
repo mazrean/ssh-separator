@@ -30,8 +30,8 @@ func NewUser(u *service.User) *User {
 
 type postNewUserRequest struct {
 	APIKey   string `json:"key" validate:"required"`
-	Name     string `json:"name" validate:"required,gt=0,lt=32,userName"`
-	Password string `json:"cred" validate:"required,gt=8,lt=32,password"`
+	Name     string `json:"name" validate:"required,userName"`
+	Password string `json:"cred" validate:"required,gt=8,lt=32,alphanum"`
 }
 
 func (u *User) PostNewUser(c echo.Context) error {

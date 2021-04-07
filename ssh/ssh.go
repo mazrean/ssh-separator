@@ -30,6 +30,11 @@ func NewSSH(user *service.User) *SSH {
 	}
 
 	server.Handler = func(s ssh.Session) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Printf("panic: %+v\n", err)
+			}
+		}()
 		_, winCh, isTty := s.Pty()
 		newWinCh := make(chan *domain.Window)
 		if isTty {

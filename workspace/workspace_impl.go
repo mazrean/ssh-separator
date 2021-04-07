@@ -19,13 +19,20 @@ import (
 )
 
 var (
-	imageRef  string = os.Getenv("IMAGE_URL")
-	imageUser string = os.Getenv("IMAGE_USER")
-	opts             = types.ContainerAttachOptions{
-		Stdin:  true,
-		Stdout: true,
-		Stderr: true,
-		Stream: true,
+	imageRef   string = os.Getenv("IMAGE_URL")
+	imageUser  string = os.Getenv("IMAGE_USER")
+	imageCmd   string = os.Getenv("IMAGE_CMD")
+	createOpts        = types.ExecConfig{
+		User:         imageUser,
+		WorkingDir:   fmt.Sprintf("/home/%s", imageUser),
+		Cmd:          []string{imageCmd},
+		Tty:          true,
+		AttachStdin:  true,
+		AttachStdout: true,
+		AttachStderr: true,
+	}
+	attachOpts = types.ExecStartCheck{
+		Tty: true,
 	}
 	containerMap = sync.Map{}
 	stopTimeout  = 10 * time.Second
@@ -119,22 +126,6 @@ func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, wi
 	if err != nil && !errdefs.IsConflict(err) {
 		return fmt.Errorf("failed to start container: %w", err)
 	}
-
-	if isTty {
-		go func() {
-			for win := range winCh {
-				err := w.cli.ContainerResize(ctx, ctnInfo.id, types.ResizeOptions{
-					Height: win.Height,
-					Width:  win.Width,
-				})
-				if err != nil {
-					log.Println(err)
-					break
-				}
-			}
-		}()
-	}
-
 	ctnInfo.manageChan <- struct{}{}
 	defer func(ctnInfo *containerInfo) {
 		<-ctnInfo.manageChan
@@ -147,7 +138,27 @@ func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, wi
 		}
 	}(ctnInfo)
 
-	stream, err := w.cli.ContainerAttach(ctx, ctnInfo.id, opts)
+	idRes, err := w.cli.ContainerExecCreate(ctx, ctnInfo.id, createOpts)
+	if err != nil {
+		return fmt.Errorf("failed to create container: %w", err)
+	}
+
+	if isTty {
+		go func() {
+			for win := range winCh {
+				err := w.cli.ContainerExecResize(ctx, idRes.ID, types.ResizeOptions{
+					Height: win.Height,
+					Width:  win.Width,
+				})
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}()
+	}
+
+	stream, err := w.cli.ContainerExecAttach(ctx, idRes.ID, attachOpts)
 	if err != nil {
 		return fmt.Errorf("failed to attach container: %w", err)
 	}
@@ -170,12 +181,6 @@ func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, wi
 		io.Copy(stream.Conn, stdin)
 	}()
 
-	resultC, errC := w.cli.ContainerWait(ctx, ctnInfo.id, container.WaitConditionNotRunning)
-	select {
-	case err = <-errC:
-		return fmt.Errorf("failed to wait container: %w", err)
-	case <-resultC:
-	}
 	err = <-outputErr
 	return nil
 }

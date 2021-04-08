@@ -10,11 +10,11 @@ import (
 )
 
 type SSH struct {
-	*service.User
+	service.IUser
 	*ssh.Server
 }
 
-func NewSSH(user *service.User) *SSH {
+func NewSSH(user service.IUser) *SSH {
 	server := ssh.Server{}
 	server.PasswordHandler = func(ctx ssh.Context, password string) bool {
 		isOK, err := user.SSHAuth(ctx, &domain.User{
@@ -55,7 +55,7 @@ func NewSSH(user *service.User) *SSH {
 	}
 
 	return &SSH{
-		User:   user,
+		IUser:  user,
 		Server: &server,
 	}
 }

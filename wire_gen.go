@@ -43,6 +43,7 @@ var (
 	transactionBind    = wire.Bind(new(repository.ITransaction), new(*repository.Transaction))
 	repositoryUserBind = wire.Bind(new(repository.IUser), new(*repository.User))
 	workspaceBind      = wire.Bind(new(workspace.IWorkspace), new(*workspace.Workspace))
+	serviceUserBind    = wire.Bind(new(service.IUser), new(*service.User))
 )
 
 type Server struct {

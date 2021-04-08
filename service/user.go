@@ -13,6 +13,12 @@ import (
 	"github.com/mazrean/separated-webshell/workspace"
 )
 
+type IUser interface {
+	New(ctx context.Context, user *domain.User) error
+	SSHAuth(ctx context.Context, user *domain.User) (bool, error)
+	SSHHandler(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
+}
+
 type User struct {
 	workspace.IWorkspace
 	repository.IUser

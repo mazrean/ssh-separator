@@ -6,48 +6,35 @@ package mock_repository
 
 import (
 	context "context"
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockITransaction is a mock of ITransaction interface
+// MockITransaction is a mock of ITransaction interface.
 type MockITransaction struct {
 	ctrl     *gomock.Controller
 	recorder *MockITransactionMockRecorder
 }
 
-// MockITransactionMockRecorder is the mock recorder for MockITransaction
+// MockITransactionMockRecorder is the mock recorder for MockITransaction.
 type MockITransactionMockRecorder struct {
 	mock *MockITransaction
 }
 
-// NewMockITransaction creates a new mock instance
+// NewMockITransaction creates a new mock instance.
 func NewMockITransaction(ctrl *gomock.Controller) *MockITransaction {
 	mock := &MockITransaction{ctrl: ctrl}
 	mock.recorder = &MockITransactionMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockITransaction) EXPECT() *MockITransactionMockRecorder {
 	return m.recorder
 }
 
-// Transaction mocks base method
-func (m *MockITransaction) Transaction(arg0 context.Context, arg1 func(context.Context) error) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Transaction", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Transaction indicates an expected call of Transaction
-func (mr *MockITransactionMockRecorder) Transaction(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Transaction", reflect.TypeOf((*MockITransaction)(nil).Transaction), arg0, arg1)
-}
-
-// RTransaction mocks base method
+// RTransaction mocks base method.
 func (m *MockITransaction) RTransaction(arg0 context.Context, arg1 func(context.Context) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RTransaction", arg0, arg1)
@@ -55,8 +42,22 @@ func (m *MockITransaction) RTransaction(arg0 context.Context, arg1 func(context.
 	return ret0
 }
 
-// RTransaction indicates an expected call of RTransaction
+// RTransaction indicates an expected call of RTransaction.
 func (mr *MockITransactionMockRecorder) RTransaction(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RTransaction", reflect.TypeOf((*MockITransaction)(nil).RTransaction), arg0, arg1)
+}
+
+// Transaction mocks base method.
+func (m *MockITransaction) Transaction(arg0 context.Context, arg1 func(context.Context) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Transaction", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Transaction indicates an expected call of Transaction.
+func (mr *MockITransactionMockRecorder) Transaction(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Transaction", reflect.TypeOf((*MockITransaction)(nil).Transaction), arg0, arg1)
 }

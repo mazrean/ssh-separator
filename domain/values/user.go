@@ -32,3 +32,7 @@ func NewPassword(password string) (Password, error) {
 
 	return Password(password), nil
 }
+
+func NewHashedPassword(hashedPassword HashedPassword) (HashedPassword, error) {
+	return HashedPassword(hashedPassword), nil
+}

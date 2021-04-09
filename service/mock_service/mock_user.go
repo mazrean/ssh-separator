@@ -10,6 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/mazrean/separated-webshell/domain"
+	values "github.com/mazrean/separated-webshell/domain/values"
 )
 
 // MockIUser is a mock of IUser interface.
@@ -65,7 +66,7 @@ func (mr *MockIUserMockRecorder) SSHAuth(ctx, user interface{}) *gomock.Call {
 }
 
 // SSHHandler mocks base method.
-func (m *MockIUser) SSHHandler(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
+func (m *MockIUser) SSHHandler(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SSHHandler", ctx, userName, connection)
 	ret0, _ := ret[0].(error)

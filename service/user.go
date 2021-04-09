@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -17,7 +16,7 @@ import (
 type IUser interface {
 	New(ctx context.Context, user *domain.User) error
 	SSHAuth(ctx context.Context, user *domain.User) (bool, error)
-	SSHHandler(ctx context.Context, userName domain.UserName, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
+	SSHHandler(ctx context.Context, userName domain.UserName, connection *domain.Connection) error
 }
 
 type User struct {
@@ -130,8 +129,8 @@ func (u *User) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
 	return true, nil
 }
 
-func (u *User) SSHHandler(ctx context.Context, userName domain.UserName, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
-	err := u.IWorkspace.Connect(ctx, userName, isTty, winCh, stdin, stdout, stderr)
+func (u *User) SSHHandler(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
+	err := u.IWorkspace.Connect(ctx, userName, connection)
 	if err != nil {
 		return fmt.Errorf("connect to workspace error: %w", err)
 	}

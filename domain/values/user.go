@@ -14,6 +14,7 @@ type (
 
 var (
 	userNameExpression = regexp.MustCompile(`^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{0,14}[a-zA-Z0-9])?$`)
+	passwordExpression = regexp.MustCompile(`^[a-zA-Z0-9]{8,32}$`)
 )
 
 func NewUserName(userName string) (UserName, error) {
@@ -22,4 +23,12 @@ func NewUserName(userName string) (UserName, error) {
 	}
 
 	return UserName(userName), nil
+}
+
+func NewPassword(password string) (Password, error) {
+	if !passwordExpression.MatchString(password) {
+		return "", errors.New("invalid password")
+	}
+
+	return Password(password), nil
 }

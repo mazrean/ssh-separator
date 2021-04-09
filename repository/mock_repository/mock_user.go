@@ -50,10 +50,10 @@ func (mr *MockIUserMockRecorder) Create(ctx, user interface{}) *gomock.Call {
 }
 
 // GetAllUser mocks base method.
-func (m *MockIUser) GetAllUser(ctx context.Context) ([]string, error) {
+func (m *MockIUser) GetAllUser(ctx context.Context) ([]domain.UserName, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllUser", ctx)
-	ret0, _ := ret[0].([]string)
+	ret0, _ := ret[0].([]domain.UserName)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +65,10 @@ func (mr *MockIUserMockRecorder) GetAllUser(ctx interface{}) *gomock.Call {
 }
 
 // GetPassword mocks base method.
-func (m *MockIUser) GetPassword(ctx context.Context, userName string) (string, error) {
+func (m *MockIUser) GetPassword(ctx context.Context, userName domain.UserName) (domain.HashedPassword, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPassword", ctx, userName)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(domain.HashedPassword)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

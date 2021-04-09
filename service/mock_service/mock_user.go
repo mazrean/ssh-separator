@@ -6,7 +6,6 @@ package mock_service
 
 import (
 	context "context"
-	io "io"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -66,15 +65,15 @@ func (mr *MockIUserMockRecorder) SSHAuth(ctx, user interface{}) *gomock.Call {
 }
 
 // SSHHandler mocks base method.
-func (m *MockIUser) SSHHandler(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout, stderr io.Writer) error {
+func (m *MockIUser) SSHHandler(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SSHHandler", ctx, userName, isTty, winCh, stdin, stdout, stderr)
+	ret := m.ctrl.Call(m, "SSHHandler", ctx, userName, connection)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SSHHandler indicates an expected call of SSHHandler.
-func (mr *MockIUserMockRecorder) SSHHandler(ctx, userName, isTty, winCh, stdin, stdout, stderr interface{}) *gomock.Call {
+func (mr *MockIUserMockRecorder) SSHHandler(ctx, userName, connection interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SSHHandler", reflect.TypeOf((*MockIUser)(nil).SSHHandler), ctx, userName, isTty, winCh, stdin, stdout, stderr)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SSHHandler", reflect.TypeOf((*MockIUser)(nil).SSHHandler), ctx, userName, connection)
 }

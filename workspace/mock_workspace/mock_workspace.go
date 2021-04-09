@@ -6,7 +6,6 @@ package mock_workspace
 
 import (
 	context "context"
-	io "io"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -37,21 +36,21 @@ func (m *MockIWorkspace) EXPECT() *MockIWorkspaceMockRecorder {
 }
 
 // Connect mocks base method.
-func (m *MockIWorkspace) Connect(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout, stderr io.Writer) error {
+func (m *MockIWorkspace) Connect(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Connect", ctx, userName, isTty, winCh, stdin, stdout, stderr)
+	ret := m.ctrl.Call(m, "Connect", ctx, userName, connection)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Connect indicates an expected call of Connect.
-func (mr *MockIWorkspaceMockRecorder) Connect(ctx, userName, isTty, winCh, stdin, stdout, stderr interface{}) *gomock.Call {
+func (mr *MockIWorkspaceMockRecorder) Connect(ctx, userName, connection interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockIWorkspace)(nil).Connect), ctx, userName, isTty, winCh, stdin, stdout, stderr)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockIWorkspace)(nil).Connect), ctx, userName, connection)
 }
 
 // Create mocks base method.
-func (m *MockIWorkspace) Create(ctx context.Context, userName string) error {
+func (m *MockIWorkspace) Create(ctx context.Context, userName domain.UserName) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, userName)
 	ret0, _ := ret[0].(error)
@@ -65,7 +64,7 @@ func (mr *MockIWorkspaceMockRecorder) Create(ctx, userName interface{}) *gomock.
 }
 
 // Remove mocks base method.
-func (m *MockIWorkspace) Remove(ctx context.Context, userName string) error {
+func (m *MockIWorkspace) Remove(ctx context.Context, userName domain.UserName) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Remove", ctx, userName)
 	ret0, _ := ret[0].(error)

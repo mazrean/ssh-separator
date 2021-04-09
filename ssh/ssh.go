@@ -6,6 +6,7 @@ import (
 
 	"github.com/gliderlabs/ssh"
 	"github.com/mazrean/separated-webshell/domain"
+	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/mazrean/separated-webshell/service"
 )
 
@@ -33,18 +34,17 @@ func NewSSH(user service.IUser) *SSH {
 			}
 		}()
 		_, winCh, isTty := s.Pty()
-		newWinCh := make(chan *domain.Window)
+		tty := values.NewTty(s, s, s)
+		connection := domain.NewConnection(isTty, tty)
+		newWinCh := connection.WindowSender()
 		if isTty {
-			go func(winCh <-chan ssh.Window, newWinCh chan<- *domain.Window) {
+			go func(winCh <-chan ssh.Window, newWinCh chan<- *values.Window) {
 				for win := range winCh {
-					newWinCh <- &domain.Window{
-						Height: uint(win.Height),
-						Width:  uint(win.Width),
-					}
+					newWinCh <- values.NewWindow(uint(win.Height), uint(win.Width))
 				}
 			}(winCh, newWinCh)
 		}
-		err := user.SSHHandler(s.Context(), domain.UserName(s.User()), isTty, newWinCh, s, s, s.Stderr())
+		err := user.SSHHandler(s.Context(), domain.UserName(s.User()), connection)
 		if err != nil {
 			log.Fatalf("failed in ssh: %+v\n", err)
 			return

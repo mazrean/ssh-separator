@@ -1,32 +1,27 @@
 package domain
 
-type (
-	UserName string
-	Password string
-	// HashedPassword 不明時""
-	HashedPassword string
-)
+import "github.com/mazrean/separated-webshell/domain/values"
 
 type User struct {
-	name UserName
-	Password
-	HashedPassword
+	name values.UserName
+	values.Password
+	values.HashedPassword
 }
 
-func NewUserWithPassword(name UserName, password Password) *User {
+func NewUserWithPassword(name values.UserName, password values.Password) *User {
 	return &User{
 		name:     name,
 		Password: password,
 	}
 }
 
-func NewUserWithHashedPassword(name UserName, hashedPassword HashedPassword) *User {
+func NewUserWithHashedPassword(name values.UserName, hashedPassword values.HashedPassword) *User {
 	return &User{
 		name:           name,
 		HashedPassword: hashedPassword,
 	}
 }
 
-func (u *User) GetName() UserName {
+func (u *User) GetName() values.UserName {
 	return u.name
 }

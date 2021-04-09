@@ -10,6 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/mazrean/separated-webshell/domain"
+	values "github.com/mazrean/separated-webshell/domain/values"
 )
 
 // MockIUser is a mock of IUser interface.
@@ -50,10 +51,10 @@ func (mr *MockIUserMockRecorder) Create(ctx, user interface{}) *gomock.Call {
 }
 
 // GetAllUser mocks base method.
-func (m *MockIUser) GetAllUser(ctx context.Context) ([]domain.UserName, error) {
+func (m *MockIUser) GetAllUser(ctx context.Context) ([]values.UserName, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllUser", ctx)
-	ret0, _ := ret[0].([]domain.UserName)
+	ret0, _ := ret[0].([]values.UserName)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +66,10 @@ func (mr *MockIUserMockRecorder) GetAllUser(ctx interface{}) *gomock.Call {
 }
 
 // GetPassword mocks base method.
-func (m *MockIUser) GetPassword(ctx context.Context, userName domain.UserName) (domain.HashedPassword, error) {
+func (m *MockIUser) GetPassword(ctx context.Context, userName values.UserName) (values.HashedPassword, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPassword", ctx, userName)
-	ret0, _ := ret[0].(domain.HashedPassword)
+	ret0, _ := ret[0].(values.HashedPassword)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

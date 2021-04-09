@@ -73,15 +73,8 @@ func NewWorkspace() (*Workspace, error) {
 func (w *Workspace) Create(ctx context.Context, userName domain.UserName) error {
 	ctnName := containerName(userName)
 	res, err := w.cli.ContainerCreate(ctx, &container.Config{
-		Image:        imageRef,
-		User:         imageUser,
-		Tty:          true,
-		OpenStdin:    true,
-		AttachStderr: true,
-		AttachStdin:  true,
-		AttachStdout: true,
-		StdinOnce:    true,
-		Volumes:      make(map[string]struct{}),
+		Image: imageRef,
+		User:  imageUser,
 	}, nil, nil, nil, ctnName)
 	if errdefs.IsConflict(err) {
 		ctnInfo, err := w.cli.ContainerInspect(ctx, ctnName)
@@ -108,7 +101,7 @@ func (w *Workspace) Create(ctx context.Context, userName domain.UserName) error 
 	return nil
 }
 
-func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
 	iContainerInfo, ok := containerMap.Load(userName)
 	if !ok {
 		return errors.New("load container info error")
@@ -143,12 +136,12 @@ func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, isTty
 		return fmt.Errorf("failed to create container: %w", err)
 	}
 
-	if isTty {
+	if connection.IsTty() {
 		go func() {
-			for win := range winCh {
+			for win := range connection.WindowReceiver() {
 				err := w.cli.ContainerExecResize(ctx, idRes.ID, types.ResizeOptions{
-					Height: win.Height,
-					Width:  win.Width,
+					Height: win.Height(),
+					Width:  win.Width(),
 				})
 				if err != nil {
 					log.Println(err)
@@ -168,17 +161,17 @@ func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, isTty
 
 	go func() {
 		var err error
-		if isTty {
-			_, err = io.Copy(stdout, stream.Reader)
+		if connection.IsTty() {
+			_, err = io.Copy(connection.Stdout(), stream.Reader)
 		} else {
-			_, err = stdcopy.StdCopy(stdout, stderr, stream.Reader)
+			_, err = stdcopy.StdCopy(connection.Stdout(), connection.Stderr(), stream.Reader)
 		}
 		outputErr <- err
 	}()
 
 	go func() {
 		defer stream.CloseWrite()
-		io.Copy(stream.Conn, stdin)
+		io.Copy(stream.Conn, connection.Stdin())
 	}()
 
 	err = <-outputErr

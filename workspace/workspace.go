@@ -14,7 +14,7 @@ var (
 )
 
 type IWorkspace interface {
-	Create(ctx context.Context, userName string) error
-	Connect(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
-	Remove(ctx context.Context, userName string) error
+	Create(ctx context.Context, userName domain.UserName) error
+	Connect(ctx context.Context, userName domain.UserName, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
+	Remove(ctx context.Context, userName domain.UserName) error
 }

@@ -17,7 +17,7 @@ import (
 type IUser interface {
 	New(ctx context.Context, user *domain.User) error
 	SSHAuth(ctx context.Context, user *domain.User) (bool, error)
-	SSHHandler(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
+	SSHHandler(ctx context.Context, userName domain.UserName, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
 }
 
 type User struct {
@@ -29,7 +29,7 @@ type User struct {
 func NewUser(w workspace.IWorkspace, ru repository.IUser, t repository.ITransaction) (*User, error) {
 	ctx := context.Background()
 
-	var users []string
+	var users []domain.UserName
 	err := t.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
 		users, err = ru.GetAllUser(ctx)
@@ -68,7 +68,7 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 		return fmt.Errorf("failed to hash password")
 	}
 
-	user.Password = string(hashedPassword)
+	user.HashedPassword = domain.HashedPassword(hashedPassword)
 
 	err = u.ITransaction.Transaction(ctx, func(ctx context.Context) error {
 		err := u.IUser.Create(ctx, user)
@@ -76,7 +76,7 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 			return fmt.Errorf("create user error: %w", err)
 		}
 
-		err = u.IWorkspace.Create(ctx, user.Name)
+		err = u.IWorkspace.Create(ctx, user.GetName())
 		if err != nil {
 			return fmt.Errorf("create workspace error: %w", err)
 		}
@@ -102,10 +102,10 @@ var (
 )
 
 func (u *User) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
-	var hashedPassword string
+	var hashedPassword domain.HashedPassword
 	err := u.ITransaction.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
-		hashedPassword, err = u.IUser.GetPassword(ctx, user.Name)
+		hashedPassword, err = u.IUser.GetPassword(ctx, user.GetName())
 		if errors.Is(err, repository.ErrUserNotExist) {
 			return ErrInvalidUser
 		}
@@ -130,7 +130,7 @@ func (u *User) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
 	return true, nil
 }
 
-func (u *User) SSHHandler(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+func (u *User) SSHHandler(ctx context.Context, userName domain.UserName, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 	err := u.IWorkspace.Connect(ctx, userName, isTty, winCh, stdin, stdout, stderr)
 	if err != nil {
 		return fmt.Errorf("connect to workspace error: %w", err)

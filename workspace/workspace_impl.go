@@ -43,7 +43,7 @@ type containerInfo struct {
 	manageChan chan struct{}
 }
 
-func containerName(userName string) string {
+func containerName(userName domain.UserName) string {
 	return fmt.Sprintf("user-%s", userName)
 }
 
@@ -52,7 +52,7 @@ type Workspace struct {
 }
 
 func NewWorkspace() (*Workspace, error) {
-	cli, err := client.NewEnvClient()
+	cli, err := client.NewClientWithOpts()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create docker client: %w", err)
 	}
@@ -70,7 +70,7 @@ func NewWorkspace() (*Workspace, error) {
 	}, nil
 }
 
-func (w *Workspace) Create(ctx context.Context, userName string) error {
+func (w *Workspace) Create(ctx context.Context, userName domain.UserName) error {
 	ctnName := containerName(userName)
 	res, err := w.cli.ContainerCreate(ctx, &container.Config{
 		Image:        imageRef,
@@ -108,7 +108,7 @@ func (w *Workspace) Create(ctx context.Context, userName string) error {
 	return nil
 }
 
-func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, isTty bool, winCh <-chan *domain.Window, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 	iContainerInfo, ok := containerMap.Load(userName)
 	if !ok {
 		return errors.New("load container info error")
@@ -182,9 +182,13 @@ func (w *Workspace) Connect(ctx context.Context, userName string, isTty bool, wi
 	}()
 
 	err = <-outputErr
+	if err != nil {
+		return fmt.Errorf("failed to stdout: %w", err)
+	}
+
 	return nil
 }
 
-func (*Workspace) Remove(ctx context.Context, userName string) error {
+func (*Workspace) Remove(ctx context.Context, userName domain.UserName) error {
 	return nil
 }

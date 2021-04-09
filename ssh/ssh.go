@@ -18,7 +18,17 @@ type SSH struct {
 func NewSSH(user service.IUser) *SSH {
 	server := ssh.Server{}
 	server.PasswordHandler = func(ctx ssh.Context, password string) bool {
-		isOK, err := user.SSHAuth(ctx, domain.NewUserWithPassword(domain.UserName(ctx.User()), domain.Password(password)))
+		userName, err := values.NewUserName(ctx.User())
+		if err != nil {
+			return false
+		}
+
+		pw, err := values.NewPassword(password)
+		if err != nil {
+			return false
+		}
+
+		isOK, err := user.SSHAuth(ctx, domain.NewUserWithPassword(userName, pw))
 		if err != nil || !isOK {
 			log.Printf("ssh login error: %+v\n", err)
 			return false
@@ -44,9 +54,16 @@ func NewSSH(user service.IUser) *SSH {
 				}
 			}(winCh, newWinCh)
 		}
-		err := user.SSHHandler(s.Context(), domain.UserName(s.User()), connection)
+
+		userName, err := values.NewUserName(s.User())
 		if err != nil {
-			log.Fatalf("failed in ssh: %+v\n", err)
+			log.Printf("failed un UserName constructor: %+v", err)
+			return
+		}
+
+		err = user.SSHHandler(s.Context(), userName, connection)
+		if err != nil {
+			log.Printf("failed in ssh: %+v\n", err)
 			return
 		}
 	}

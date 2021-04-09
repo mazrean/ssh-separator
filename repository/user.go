@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/mazrean/separated-webshell/domain"
+	"github.com/mazrean/separated-webshell/domain/values"
 )
 
 var (
@@ -15,6 +16,6 @@ var (
 
 type IUser interface {
 	Create(ctx context.Context, user *domain.User) error
-	GetPassword(ctx context.Context, userName domain.UserName) (hashedPassword domain.HashedPassword, err error)
-	GetAllUser(ctx context.Context) (users []domain.UserName, err error)
+	GetPassword(ctx context.Context, userName values.UserName) (hashedPassword values.HashedPassword, err error)
+	GetAllUser(ctx context.Context) (users []values.UserName, err error)
 }

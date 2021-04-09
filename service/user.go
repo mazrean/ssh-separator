@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/mazrean/separated-webshell/domain"
+	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/mazrean/separated-webshell/repository"
 	"github.com/mazrean/separated-webshell/workspace"
 )
@@ -16,7 +17,7 @@ import (
 type IUser interface {
 	New(ctx context.Context, user *domain.User) error
 	SSHAuth(ctx context.Context, user *domain.User) (bool, error)
-	SSHHandler(ctx context.Context, userName domain.UserName, connection *domain.Connection) error
+	SSHHandler(ctx context.Context, userName values.UserName, connection *domain.Connection) error
 }
 
 type User struct {
@@ -28,7 +29,7 @@ type User struct {
 func NewUser(w workspace.IWorkspace, ru repository.IUser, t repository.ITransaction) (*User, error) {
 	ctx := context.Background()
 
-	var users []domain.UserName
+	var users []values.UserName
 	err := t.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
 		users, err = ru.GetAllUser(ctx)
@@ -67,7 +68,12 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 		return fmt.Errorf("failed to hash password")
 	}
 
-	user.HashedPassword = domain.HashedPassword(hashedPassword)
+	newHashedPassword, err := values.NewHashedPassword(string(hashedPassword))
+	if err != nil {
+		return fmt.Errorf("failed in HashedPassword constructor: %w", err)
+	}
+
+	user.HashedPassword = newHashedPassword
 
 	err = u.ITransaction.Transaction(ctx, func(ctx context.Context) error {
 		err := u.IUser.Create(ctx, user)
@@ -101,7 +107,7 @@ var (
 )
 
 func (u *User) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
-	var hashedPassword domain.HashedPassword
+	var hashedPassword values.HashedPassword
 	err := u.ITransaction.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
 		hashedPassword, err = u.IUser.GetPassword(ctx, user.GetName())
@@ -129,7 +135,7 @@ func (u *User) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
 	return true, nil
 }
 
-func (u *User) SSHHandler(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
+func (u *User) SSHHandler(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
 	err := u.IWorkspace.Connect(ctx, userName, connection)
 	if err != nil {
 		return fmt.Errorf("connect to workspace error: %w", err)

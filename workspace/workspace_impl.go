@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/errdefs"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/mazrean/separated-webshell/domain"
+	"github.com/mazrean/separated-webshell/domain/values"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -44,7 +45,7 @@ type containerInfo struct {
 	manageChan chan struct{}
 }
 
-func containerName(userName domain.UserName) string {
+func containerName(userName values.UserName) string {
 	return fmt.Sprintf("user-%s", userName)
 }
 
@@ -71,7 +72,7 @@ func NewWorkspace() (*Workspace, error) {
 	}, nil
 }
 
-func (w *Workspace) Create(ctx context.Context, userName domain.UserName) error {
+func (w *Workspace) Create(ctx context.Context, userName values.UserName) error {
 	ctnName := containerName(userName)
 	res, err := w.cli.ContainerCreate(ctx, &container.Config{
 		Image: imageRef,
@@ -102,7 +103,7 @@ func (w *Workspace) Create(ctx context.Context, userName domain.UserName) error 
 	return nil
 }
 
-func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
+func (w *Workspace) Connect(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
 	iContainerInfo, ok := containerMap.Load(userName)
 	if !ok {
 		return errors.New("load container info error")
@@ -194,6 +195,6 @@ func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, conne
 	return nil
 }
 
-func (*Workspace) Remove(ctx context.Context, userName domain.UserName) error {
+func (*Workspace) Remove(ctx context.Context, userName values.UserName) error {
 	return nil
 }

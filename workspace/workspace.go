@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/mazrean/separated-webshell/domain"
+	"github.com/mazrean/separated-webshell/domain/values"
 )
 
 var (
@@ -13,7 +14,7 @@ var (
 )
 
 type IWorkspace interface {
-	Create(ctx context.Context, userName domain.UserName) error
-	Connect(ctx context.Context, userName domain.UserName, connection *domain.Connection) error
-	Remove(ctx context.Context, userName domain.UserName) error
+	Create(ctx context.Context, userName values.UserName) error
+	Connect(ctx context.Context, userName values.UserName, connection *domain.Connection) error
+	Remove(ctx context.Context, userName values.UserName) error
 }

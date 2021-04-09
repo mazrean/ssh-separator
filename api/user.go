@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/mazrean/separated-webshell/domain"
+	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/mazrean/separated-webshell/service"
 )
 
@@ -30,8 +31,8 @@ func NewUser(u *service.User) *User {
 
 type postNewUserRequest struct {
 	APIKey   string `json:"key" validate:"required"`
-	Name     string `json:"name" validate:"required,userName"`
-	Password string `json:"cred" validate:"required,gt=8,lt=32,alphanum"`
+	Name     string `json:"name" validate:"required"`
+	Password string `json:"cred" validate:"required"`
 }
 
 func (u *User) PostNewUser(c echo.Context) error {
@@ -50,7 +51,17 @@ func (u *User) PostNewUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid api key")
 	}
 
-	err = u.User.New(c.Request().Context(), domain.NewUserWithPassword(domain.UserName(req.Name), domain.Password(req.Password)))
+	userName, err := values.NewUserName(req.Name)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	password, err := values.NewPassword(req.Password)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	err = u.User.New(c.Request().Context(), domain.NewUserWithPassword(userName, password))
 	if errors.Is(err, service.ErrUserExist) {
 		return echo.NewHTTPError(http.StatusBadRequest, "user already exist")
 	}

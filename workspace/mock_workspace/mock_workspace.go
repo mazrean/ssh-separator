@@ -10,6 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/mazrean/separated-webshell/domain"
+	values "github.com/mazrean/separated-webshell/domain/values"
 )
 
 // MockIWorkspace is a mock of IWorkspace interface.
@@ -36,7 +37,7 @@ func (m *MockIWorkspace) EXPECT() *MockIWorkspaceMockRecorder {
 }
 
 // Connect mocks base method.
-func (m *MockIWorkspace) Connect(ctx context.Context, userName domain.UserName, connection *domain.Connection) error {
+func (m *MockIWorkspace) Connect(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect", ctx, userName, connection)
 	ret0, _ := ret[0].(error)
@@ -50,7 +51,7 @@ func (mr *MockIWorkspaceMockRecorder) Connect(ctx, userName, connection interfac
 }
 
 // Create mocks base method.
-func (m *MockIWorkspace) Create(ctx context.Context, userName domain.UserName) error {
+func (m *MockIWorkspace) Create(ctx context.Context, userName values.UserName) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, userName)
 	ret0, _ := ret[0].(error)
@@ -64,7 +65,7 @@ func (mr *MockIWorkspaceMockRecorder) Create(ctx, userName interface{}) *gomock.
 }
 
 // Remove mocks base method.
-func (m *MockIWorkspace) Remove(ctx context.Context, userName domain.UserName) error {
+func (m *MockIWorkspace) Remove(ctx context.Context, userName values.UserName) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Remove", ctx, userName)
 	ret0, _ := ret[0].(error)

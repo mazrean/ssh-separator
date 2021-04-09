@@ -50,10 +50,7 @@ func (u *User) PostNewUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid api key")
 	}
 
-	err = u.User.New(c.Request().Context(), &domain.User{
-		Name:     req.Name,
-		Password: req.Password,
-	})
+	err = u.User.New(c.Request().Context(), domain.NewUserWithPassword(domain.UserName(req.Name), domain.Password(req.Password)))
 	if errors.Is(err, service.ErrUserExist) {
 		return echo.NewHTTPError(http.StatusBadRequest, "user already exist")
 	}

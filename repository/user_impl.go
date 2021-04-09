@@ -25,12 +25,12 @@ func (*User) Create(ctx context.Context, user *domain.User) error {
 		return errors.New("no transaction")
 	}
 
-	_, err = txn.Get([]byte(user.Name))
+	_, err = txn.Get([]byte(user.GetName()))
 	if err == nil || !errors.Is(err, badger.ErrKeyNotFound) {
 		return ErrUserExist
 	}
 
-	err = txn.Set([]byte(user.Name), []byte(user.Password))
+	err = txn.Set([]byte(user.GetName()), []byte(user.Password))
 	if err != nil {
 		return fmt.Errorf("failed to set password: %w", err)
 	}
@@ -38,7 +38,7 @@ func (*User) Create(ctx context.Context, user *domain.User) error {
 	return nil
 }
 
-func (*User) GetPassword(ctx context.Context, userName string) (string, error) {
+func (*User) GetPassword(ctx context.Context, userName domain.UserName) (domain.HashedPassword, error) {
 	txn, err := getTransaction(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to get transaction: %w", err)
@@ -52,9 +52,9 @@ func (*User) GetPassword(ctx context.Context, userName string) (string, error) {
 		return "", fmt.Errorf("failed to get password: %w", err)
 	}
 
-	var password string
+	var password domain.HashedPassword
 	item.Value(func(val []byte) error {
-		password = string(val)
+		password = domain.HashedPassword(val)
 
 		return nil
 	})
@@ -62,7 +62,7 @@ func (*User) GetPassword(ctx context.Context, userName string) (string, error) {
 	return password, nil
 }
 
-func (*User) GetAllUser(ctx context.Context) ([]string, error) {
+func (*User) GetAllUser(ctx context.Context) ([]domain.UserName, error) {
 	txn, err := getTransaction(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get transaction: %w", err)
@@ -76,12 +76,12 @@ func (*User) GetAllUser(ctx context.Context) ([]string, error) {
 	it := txn.NewIterator(opts)
 	defer it.Close()
 
-	users := make([]string, 0, 10)
+	users := make([]domain.UserName, 0, 10)
 
 	for it.Rewind(); it.Valid(); it.Next() {
 		item := it.Item()
 		k := item.Key()
-		users = append(users, string(k))
+		users = append(users, domain.UserName(k))
 	}
 
 	return users, nil

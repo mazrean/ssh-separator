@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/errdefs"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/mazrean/separated-webshell/domain"
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -157,24 +158,35 @@ func (w *Workspace) Connect(ctx context.Context, userName domain.UserName, conne
 	}
 	defer stream.Close()
 
-	outputErr := make(chan error)
+	eg, ctx := errgroup.WithContext(ctx)
 
-	go func() {
-		var err error
+	eg.Go(func() error {
 		if connection.IsTty() {
 			_, err = io.Copy(connection.Stdout(), stream.Reader)
+			if err != nil {
+				return fmt.Errorf("failed to copy stdout: %w", err)
+			}
 		} else {
 			_, err = stdcopy.StdCopy(connection.Stdout(), connection.Stderr(), stream.Reader)
+			if err != nil {
+				return fmt.Errorf("failed to stdcopy: %w", err)
+			}
 		}
-		outputErr <- err
-	}()
 
-	go func() {
+		return nil
+	})
+
+	eg.Go(func() error {
 		defer stream.CloseWrite()
-		io.Copy(stream.Conn, connection.Stdin())
-	}()
+		_, err := io.Copy(stream.Conn, connection.Stdin())
+		if err != nil {
+			return fmt.Errorf("failed to copy stdin: %w", err)
+		}
 
-	err = <-outputErr
+		return nil
+	})
+
+	err = eg.Wait()
 	if err != nil {
 		return fmt.Errorf("failed to stdout: %w", err)
 	}

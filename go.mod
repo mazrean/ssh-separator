@@ -24,6 +24,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	golang.org/x/crypto v0.0.0-20210317152858-513c2a44f670
+	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	google.golang.org/grpc v1.36.0 // indirect
 	gotest.tools/v3 v3.0.3 // indirect
 )

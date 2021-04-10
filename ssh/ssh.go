@@ -44,7 +44,7 @@ func NewSSH(user service.IUser) *SSH {
 			}
 		}()
 		_, winCh, isTty := s.Pty()
-		tty := values.NewTty(s, s, s)
+		tty := values.NewConnectionIO(s, s, s)
 		connection := domain.NewConnection(isTty, tty)
 		newWinCh := connection.WindowSender()
 		if isTty {

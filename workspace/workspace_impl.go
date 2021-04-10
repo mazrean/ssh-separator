@@ -139,18 +139,23 @@ func (w *Workspace) Connect(ctx context.Context, userName values.UserName, conne
 	}
 
 	if connection.IsTty() {
-		go func() {
-			for win := range connection.WindowReceiver() {
-				err := w.cli.ContainerExecResize(ctx, idRes.ID, types.ResizeOptions{
-					Height: win.Height(),
-					Width:  win.Width(),
-				})
-				if err != nil {
-					log.Println(err)
-					break
+		go func(ctx context.Context) {
+		WINDOW_RESIZE:
+			for {
+				select {
+				case win := <-connection.WindowReceiver():
+					err := w.cli.ContainerExecResize(ctx, idRes.ID, types.ResizeOptions{
+						Height: win.Height(),
+						Width:  win.Width(),
+					})
+					if err != nil {
+						log.Println(err)
+					}
+				case <-ctx.Done():
+					break WINDOW_RESIZE
 				}
 			}
-		}()
+		}(ctx)
 	}
 
 	stream, err := w.cli.ContainerExecAttach(ctx, idRes.ID, attachOpts)

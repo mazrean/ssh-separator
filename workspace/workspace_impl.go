@@ -182,15 +182,13 @@ func (w *Workspace) Connect(ctx context.Context, userName values.UserName, conne
 		return nil
 	})
 
-	eg.Go(func() error {
+	go func() {
 		defer stream.CloseWrite()
 		_, err := io.Copy(stream.Conn, connection.Stdin())
 		if err != nil {
-			return fmt.Errorf("failed to copy stdin: %w", err)
+			log.Printf("failed to copy stdin: %+v\n", err)
 		}
-
-		return nil
-	})
+	}()
 
 	err = eg.Wait()
 	if err != nil {

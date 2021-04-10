@@ -16,8 +16,7 @@ import (
 
 type IUser interface {
 	New(ctx context.Context, user *domain.User) error
-	SSHAuth(ctx context.Context, user *domain.User) (bool, error)
-	SSHHandler(ctx context.Context, userName values.UserName, connection *domain.Connection) error
+	Auth(ctx context.Context, user *domain.User) (bool, error)
 }
 
 type User struct {
@@ -133,13 +132,4 @@ func (u *User) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func (u *User) SSHHandler(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
-	err := u.IWorkspace.Connect(ctx, userName, connection)
-	if err != nil {
-		return fmt.Errorf("connect to workspace error: %w", err)
-	}
-
-	return nil
 }

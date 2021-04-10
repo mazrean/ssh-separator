@@ -1,7 +1,13 @@
 package values
 
 type (
-	WorkspaceName string
+	WorkspaceName   string
+	WorkspaceStatus int
+)
+
+const (
+	StatusDown WorkspaceStatus = iota
+	StatusUp   WorkspaceStatus = iota
 )
 
 func NewWorkspaceName(name string) WorkspaceName {

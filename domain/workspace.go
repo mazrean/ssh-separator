@@ -5,6 +5,7 @@ import "github.com/mazrean/separated-webshell/domain/values"
 type Workspace struct {
 	name     values.WorkspaceName
 	userName values.UserName
+	Status   values.WorkspaceStatus
 }
 
 func NewWorkspace(name values.WorkspaceName, userName values.UserName) *Workspace {

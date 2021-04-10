@@ -31,7 +31,7 @@ func (*User) Create(ctx context.Context, user *domain.User) error {
 		return ErrUserExist
 	}
 
-	err = txn.Set([]byte(user.GetName()), []byte(user.Password))
+	err = txn.Set([]byte(user.GetName()), []byte(user.HashedPassword))
 	if err != nil {
 		return fmt.Errorf("failed to set password: %w", err)
 	}

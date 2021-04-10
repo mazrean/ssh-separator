@@ -14,7 +14,7 @@ var (
 )
 
 type IWorkspace interface {
-	Create(ctx context.Context, userName values.UserName) error
-	Connect(ctx context.Context, userName values.UserName, connection *domain.Connection) error
-	Remove(ctx context.Context, userName values.UserName) error
+	Create(ctx context.Context, userName values.UserName) (*domain.Workspace, error)
+	Start(ctx context.Context, workspace *domain.Workspace) error
+	Stop(ctx context.Context, workspace *domain.Workspace) error
 }

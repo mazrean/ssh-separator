@@ -16,7 +16,12 @@ services:
     ports:
       - 2222:2222
       - 3000:3000
+      - 2345:2345
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../badger:/tmp/badger
       - ../:/app/
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_PTRACE

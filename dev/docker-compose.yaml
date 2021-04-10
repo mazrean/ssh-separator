@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  ssh-server:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
+    environment:
+      API_PORT: 3000
+      SSH_PORT: 2222
+      BADGER_DIR: /tmp/badger
+      IMAGE_URL: mazrean/cpctf-ubuntu:latest
+      IMAGE_USER: ubuntu
+      IMAGE_CMD: /bin/bash
+      API_KEY:
+    ports:
+      - 2222:2222
+      - 3000:3000
+      - 2345:2345
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../badger:/tmp/badger
+      - ../:/app/
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_PTRACE

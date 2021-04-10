@@ -2,3 +2,5 @@ key
 key.pub
 .env
 badger
+tmp
+.vscode

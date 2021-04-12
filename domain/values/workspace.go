@@ -1,7 +1,7 @@
 package values
 
 type (
-	WorkspaceID string
+	WorkspaceID     string
 	WorkspaceName   string
 	WorkspaceStatus int
 )

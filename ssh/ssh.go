@@ -71,7 +71,7 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 
 	return &SSH{
 		IUser:  user,
-		IPipe: pipe,
+		IPipe:  pipe,
 		Server: &server,
 	}
 }

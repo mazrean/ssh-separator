@@ -29,7 +29,7 @@ var (
 	attachOpts = types.ExecStartCheck{
 		Tty: true,
 	}
-	stopTimeout  = 10 * time.Second
+	stopTimeout = 10 * time.Second
 )
 
 type containerInfo struct {
@@ -41,7 +41,7 @@ func containerName(userName values.UserName) string {
 	return fmt.Sprintf("user-%s", userName)
 }
 
-type Workspace struct {}
+type Workspace struct{}
 
 func NewWorkspace() (*Workspace, error) {
 	return &Workspace{}, nil
@@ -52,7 +52,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 	res, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: imageRef,
 		User:  imageUser,
-		Tty: true,
+		Tty:   true,
 	}, nil, nil, nil, ctnName)
 	if errdefs.IsConflict(err) {
 		ctnInfo, err := cli.ContainerInspect(ctx, ctnName)

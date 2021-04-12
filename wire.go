@@ -6,22 +6,22 @@ import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
 	"github.com/mazrean/separated-webshell/repository"
-	"github.com/mazrean/separated-webshell/store"
-	"github.com/mazrean/separated-webshell/store/gomap"
 	"github.com/mazrean/separated-webshell/service"
 	"github.com/mazrean/separated-webshell/ssh"
+	"github.com/mazrean/separated-webshell/store"
+	"github.com/mazrean/separated-webshell/store/gomap"
 	"github.com/mazrean/separated-webshell/workspace"
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
 var (
-	transactionBind    = wire.Bind(new(repository.ITransaction), new(*repository.Transaction))
-	storeWorkspaceBind = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))
-	repositoryUserBind = wire.Bind(new(repository.IUser), new(*repository.User))
-	workspaceBind      = wire.Bind(new(workspace.IWorkspace), new(*docker.Workspace))
-	workspaceConnectionBind      = wire.Bind(new(workspace.IWorkspaceConnection), new(*docker.WorkspaceConnection))
-	serviceUserBind    = wire.Bind(new(service.IUser), new(*service.User))
-	servicePipeBind    = wire.Bind(new(service.IPipe), new(*service.Pipe))
+	transactionBind         = wire.Bind(new(repository.ITransaction), new(*repository.Transaction))
+	storeWorkspaceBind      = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))
+	repositoryUserBind      = wire.Bind(new(repository.IUser), new(*repository.User))
+	workspaceBind           = wire.Bind(new(workspace.IWorkspace), new(*docker.Workspace))
+	workspaceConnectionBind = wire.Bind(new(workspace.IWorkspaceConnection), new(*docker.WorkspaceConnection))
+	serviceUserBind         = wire.Bind(new(service.IUser), new(*service.User))
+	servicePipeBind         = wire.Bind(new(service.IPipe), new(*service.Pipe))
 )
 
 type Server struct {
@@ -33,8 +33,8 @@ type Server struct {
 func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 	return &Server{
 		Setup: setup,
-		API: a,
-		SSH: s,
+		API:   a,
+		SSH:   s,
 	}, nil
 }
 

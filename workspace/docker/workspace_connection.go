@@ -9,7 +9,7 @@ import (
 	"github.com/mazrean/separated-webshell/domain/values"
 )
 
-type WorkspaceConnection struct {}
+type WorkspaceConnection struct{}
 
 func NewWorkspaceConnection() *WorkspaceConnection {
 	return &WorkspaceConnection{}

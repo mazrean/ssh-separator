@@ -17,10 +17,10 @@ type Workspace struct {
 
 func NewWorkspace(id values.WorkspaceID, name values.WorkspaceName, userName values.UserName) *Workspace {
 	return &Workspace{
-		id: id,
+		id:            id,
 		name:          name,
 		userName:      userName,
-		Status: values.StatusDown,
+		Status:        values.StatusDown,
 		connectionNum: 0,
 	}
 }

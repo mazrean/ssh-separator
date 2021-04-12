@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	createOpts        = types.ExecConfig{
+	createOpts = types.ExecConfig{
 		User:         imageUser,
 		WorkingDir:   fmt.Sprintf("/home/%s", imageUser),
 		Cmd:          []string{imageCmd},

@@ -8,6 +8,12 @@ type User struct {
 	values.HashedPassword
 }
 
+func NewUser(name values.UserName) *User {
+	return &User{
+		name: name,
+	}
+}
+
 func NewUserWithPassword(name values.UserName, password values.Password) *User {
 	return &User{
 		name:     name,

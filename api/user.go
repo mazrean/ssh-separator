@@ -73,8 +73,8 @@ func (u *User) PostNewUser(c echo.Context) error {
 }
 
 type putResetRequest struct {
-	APIKey   string `json:"key" validate:"required"`
-	Name     string `json:"name" validate:"required"`
+	APIKey string `json:"key" validate:"required"`
+	Name   string `json:"name" validate:"required"`
 }
 
 func (u *User) PutReset(c echo.Context) error {

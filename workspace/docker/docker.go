@@ -11,6 +11,9 @@ import (
 )
 
 var (
+	imageRef   string = os.Getenv("IMAGE_URL")
+	imageUser  string = os.Getenv("IMAGE_USER")
+	imageCmd   string = os.Getenv("IMAGE_CMD")
 	cli *client.Client
 )
 

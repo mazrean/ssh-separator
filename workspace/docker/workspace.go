@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -14,21 +13,6 @@ import (
 )
 
 var (
-	imageRef   string = os.Getenv("IMAGE_URL")
-	imageUser  string = os.Getenv("IMAGE_USER")
-	imageCmd   string = os.Getenv("IMAGE_CMD")
-	createOpts        = types.ExecConfig{
-		User:         imageUser,
-		WorkingDir:   fmt.Sprintf("/home/%s", imageUser),
-		Cmd:          []string{imageCmd},
-		Tty:          true,
-		AttachStdin:  true,
-		AttachStdout: true,
-		AttachStderr: true,
-	}
-	attachOpts = types.ExecStartCheck{
-		Tty: true,
-	}
 	stopTimeout = 10 * time.Second
 )
 

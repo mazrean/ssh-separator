@@ -89,7 +89,7 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 func (u *User) ResetContainer(ctx context.Context, user *domain.User) error {
 	workspace, err := u.sw.Get(ctx, user.GetName())
 	if err != nil {
-		return fmt.Errorf("failed to get workspace: %w", err)
+		return ErrInvalidUser
 	}
 
 	workspace, err = u.ww.Recreate(ctx, workspace)

@@ -72,3 +72,28 @@ func (w *Workspace) Stop(ctx context.Context, workspace *domain.Workspace) error
 
 	return nil
 }
+
+func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (*domain.Workspace, error) {
+	err := cli.ContainerRemove(ctx, string(workspace.ID()), types.ContainerRemoveOptions{
+		Force: true,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to remove container: %w", err)
+	}
+
+	userName := workspace.UserName()
+	ctnName := string(workspace.Name())
+	res, err := cli.ContainerCreate(ctx, &container.Config{
+		Image: imageRef,
+		User:  imageUser,
+		Tty:   true,
+	}, nil, nil, nil, ctnName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create container: %w", err)
+	}
+
+	workspaceID := values.NewWorkspaceID(res.ID)
+	workspaceName := values.NewWorkspaceName(ctnName)
+
+	return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
+}

@@ -66,6 +66,7 @@ func (api *API) Start(port int) error {
 	}
 
 	e.POST("/new", api.User.PostNewUser)
+	e.PUT("/reset", api.User.PutReset)
 
 	return e.Start(fmt.Sprintf(":%d", port))
 }

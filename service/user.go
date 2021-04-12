@@ -17,6 +17,7 @@ import (
 
 type IUser interface {
 	New(ctx context.Context, user *domain.User) error
+	ResetContainer(ctx context.Context, user *domain.User) error
 	Auth(ctx context.Context, user *domain.User) (bool, error)
 }
 
@@ -80,6 +81,25 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 	}
 	if err != nil {
 		return fmt.Errorf("failed in transaction: %w", err)
+	}
+
+	return nil
+}
+
+func (u *User) ResetContainer(ctx context.Context, user *domain.User) error {
+	workspace, err := u.sw.Get(ctx, user.GetName())
+	if err != nil {
+		return ErrInvalidUser
+	}
+
+	workspace, err = u.ww.Recreate(ctx, workspace)
+	if err != nil {
+		return fmt.Errorf("failed to recreate workspace: %w", err)
+	}
+
+	err = u.sw.Set(ctx, user.GetName(), workspace)
+	if err != nil {
+		return fmt.Errorf("failed to set workspace: %w", err)
 	}
 
 	return nil

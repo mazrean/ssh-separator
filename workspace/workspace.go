@@ -17,4 +17,5 @@ type IWorkspace interface {
 	Create(ctx context.Context, userName values.UserName) (*domain.Workspace, error)
 	Start(ctx context.Context, workspace *domain.Workspace) error
 	Stop(ctx context.Context, workspace *domain.Workspace) error
+	Recreate(ctx context.Context, workspace *domain.Workspace) (*domain.Workspace, error)
 }

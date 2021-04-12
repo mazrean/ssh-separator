@@ -12,10 +12,11 @@ import (
 
 type SSH struct {
 	service.IUser
+	service.IPipe
 	*ssh.Server
 }
 
-func NewSSH(user service.IUser) *SSH {
+func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 	server := ssh.Server{}
 	server.PasswordHandler = func(ctx ssh.Context, password string) bool {
 		userName, err := values.NewUserName(ctx.User())
@@ -28,7 +29,7 @@ func NewSSH(user service.IUser) *SSH {
 			return false
 		}
 
-		isOK, err := user.SSHAuth(ctx, domain.NewUserWithPassword(userName, pw))
+		isOK, err := user.Auth(ctx, domain.NewUserWithPassword(userName, pw))
 		if err != nil || !isOK {
 			log.Printf("ssh login error: %+v\n", err)
 			return false
@@ -44,7 +45,7 @@ func NewSSH(user service.IUser) *SSH {
 			}
 		}()
 		_, winCh, isTty := s.Pty()
-		tty := values.NewTty(s, s, s)
+		tty := values.NewConnectionIO(s, s, s)
 		connection := domain.NewConnection(isTty, tty)
 		newWinCh := connection.WindowSender()
 		if isTty {
@@ -61,7 +62,7 @@ func NewSSH(user service.IUser) *SSH {
 			return
 		}
 
-		err = user.SSHHandler(s.Context(), userName, connection)
+		err = pipe.Pipe(s.Context(), userName, connection)
 		if err != nil {
 			log.Printf("failed in ssh: %+v\n", err)
 			return
@@ -70,6 +71,7 @@ func NewSSH(user service.IUser) *SSH {
 
 	return &SSH{
 		IUser:  user,
+		IPipe:  pipe,
 		Server: &server,
 	}
 }

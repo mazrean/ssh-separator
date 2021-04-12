@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/mazrean/separated-webshell/repository"
+	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
 func main() {
@@ -30,6 +32,16 @@ func main() {
 	server, err := InjectServer()
 	if err != nil {
 		panic(err)
+	}
+
+	err = docker.Setup()
+	if err != nil {
+		panic(fmt.Errorf("failed to setup docker: %w", err))
+	}
+
+	err = server.Setup.Setup()
+	if err != nil {
+		panic(fmt.Errorf("failed to setup service: %w", err))
 	}
 
 	api := server.API

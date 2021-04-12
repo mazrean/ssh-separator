@@ -8,11 +8,11 @@ import (
 
 type Connection struct {
 	isTty      bool
-	io         *values.IO
+	io         *values.ConnectionIO
 	windowPipe chan *values.Window
 }
 
-func NewConnection(isTty bool, io *values.IO) *Connection {
+func NewConnection(isTty bool, io *values.ConnectionIO) *Connection {
 	return &Connection{
 		isTty:      isTty,
 		io:         io,

@@ -10,7 +10,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/mazrean/separated-webshell/domain"
-	values "github.com/mazrean/separated-webshell/domain/values"
 )
 
 // MockIUser is a mock of IUser interface.
@@ -36,6 +35,21 @@ func (m *MockIUser) EXPECT() *MockIUserMockRecorder {
 	return m.recorder
 }
 
+// Auth mocks base method.
+func (m *MockIUser) Auth(ctx context.Context, user *domain.User) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Auth", ctx, user)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Auth indicates an expected call of Auth.
+func (mr *MockIUserMockRecorder) Auth(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Auth", reflect.TypeOf((*MockIUser)(nil).Auth), ctx, user)
+}
+
 // New mocks base method.
 func (m *MockIUser) New(ctx context.Context, user *domain.User) error {
 	m.ctrl.T.Helper()
@@ -48,33 +62,4 @@ func (m *MockIUser) New(ctx context.Context, user *domain.User) error {
 func (mr *MockIUserMockRecorder) New(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockIUser)(nil).New), ctx, user)
-}
-
-// SSHAuth mocks base method.
-func (m *MockIUser) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SSHAuth", ctx, user)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SSHAuth indicates an expected call of SSHAuth.
-func (mr *MockIUserMockRecorder) SSHAuth(ctx, user interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SSHAuth", reflect.TypeOf((*MockIUser)(nil).SSHAuth), ctx, user)
-}
-
-// SSHHandler mocks base method.
-func (m *MockIUser) SSHHandler(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SSHHandler", ctx, userName, connection)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SSHHandler indicates an expected call of SSHHandler.
-func (mr *MockIUserMockRecorder) SSHHandler(ctx, userName, connection interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SSHHandler", reflect.TypeOf((*MockIUser)(nil).SSHHandler), ctx, userName, connection)
 }

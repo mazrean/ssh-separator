@@ -11,6 +11,7 @@ import (
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/mazrean/separated-webshell/repository"
+	"github.com/mazrean/separated-webshell/store"
 	"github.com/mazrean/separated-webshell/workspace"
 )
 
@@ -20,40 +21,19 @@ type IUser interface {
 }
 
 type User struct {
-	workspace.IWorkspace
-	repository.IUser
-	repository.ITransaction
+	ww workspace.IWorkspace
+	sw store.IWorkspace
+	ru repository.IUser
+	rt repository.ITransaction
 }
 
-func NewUser(w workspace.IWorkspace, ru repository.IUser, t repository.ITransaction) (*User, error) {
-	ctx := context.Background()
-
-	var users []values.UserName
-	err := t.RTransaction(ctx, func(ctx context.Context) error {
-		var err error
-		users, err = ru.GetAllUser(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to get all user: %w", err)
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed in transaction: %w", err)
-	}
-
-	for _, user := range users {
-		err := w.Create(ctx, user)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create container: %w", err)
-		}
-	}
-
+func NewUser(ww workspace.IWorkspace, sw store.IWorkspace, ru repository.IUser, rt repository.ITransaction) *User {
 	return &User{
-		IWorkspace:   w,
-		IUser:        ru,
-		ITransaction: t,
-	}, nil
+		ww: ww,
+		sw: sw,
+		ru: ru,
+		rt: rt,
+	}
 }
 
 var (
@@ -74,15 +54,20 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 
 	user.HashedPassword = newHashedPassword
 
-	err = u.ITransaction.Transaction(ctx, func(ctx context.Context) error {
-		err := u.IUser.Create(ctx, user)
+	err = u.rt.Transaction(ctx, func(ctx context.Context) error {
+		err := u.ru.Create(ctx, user)
 		if err != nil {
 			return fmt.Errorf("create user error: %w", err)
 		}
 
-		err = u.IWorkspace.Create(ctx, user.GetName())
+		workspace, err := u.ww.Create(ctx, user.GetName())
 		if err != nil {
 			return fmt.Errorf("create workspace error: %w", err)
+		}
+		err = u.sw.Set(ctx, user.GetName(), workspace)
+		// TODO: 起動済みwokspaceがstoreに登録されない可能性あり
+		if err != nil {
+			return fmt.Errorf("failed to set workspace: %w", err)
 		}
 
 		return nil
@@ -105,11 +90,11 @@ var (
 	ErrIncorrectPassword = errors.New("incorrect password")
 )
 
-func (u *User) SSHAuth(ctx context.Context, user *domain.User) (bool, error) {
+func (u *User) Auth(ctx context.Context, user *domain.User) (bool, error) {
 	var hashedPassword values.HashedPassword
-	err := u.ITransaction.RTransaction(ctx, func(ctx context.Context) error {
+	err := u.rt.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
-		hashedPassword, err = u.IUser.GetPassword(ctx, user.GetName())
+		hashedPassword, err = u.ru.GetPassword(ctx, user.GetName())
 		if errors.Is(err, repository.ErrUserNotExist) {
 			return ErrInvalidUser
 		}

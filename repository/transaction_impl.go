@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/dgraph-io/badger/v3"
+	ctxManager "github.com/mazrean/separated-webshell/pkg/context"
 )
 
 type Transaction struct{}
@@ -14,13 +15,9 @@ func NewTransaction() *Transaction {
 	return &Transaction{}
 }
 
-const (
-	transactionKey = "transaction"
-)
-
 func (*Transaction) Transaction(ctx context.Context, fn func(ctx context.Context) error) error {
 	err := db.Update(func(txn *badger.Txn) error {
-		ctx := context.WithValue(ctx, transactionKey, txn)
+		ctx := context.WithValue(ctx, ctxManager.TransactionKey, txn)
 
 		return fn(ctx)
 	})
@@ -33,7 +30,7 @@ func (*Transaction) Transaction(ctx context.Context, fn func(ctx context.Context
 
 func (*Transaction) RTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
 	err := db.View(func(txn *badger.Txn) error {
-		ctx := context.WithValue(ctx, transactionKey, txn)
+		ctx := context.WithValue(ctx, ctxManager.TransactionKey, txn)
 
 		return fn(ctx)
 	})
@@ -45,7 +42,7 @@ func (*Transaction) RTransaction(ctx context.Context, fn func(ctx context.Contex
 }
 
 func getTransaction(ctx context.Context) (*badger.Txn, error) {
-	iTxn := ctx.Value(transactionKey)
+	iTxn := ctx.Value(ctxManager.TransactionKey)
 	if iTxn == nil {
 		return nil, nil
 	}

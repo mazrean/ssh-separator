@@ -36,26 +36,13 @@ func (m *MockIWorkspace) EXPECT() *MockIWorkspaceMockRecorder {
 	return m.recorder
 }
 
-// Connect mocks base method.
-func (m *MockIWorkspace) Connect(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Connect", ctx, userName, connection)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Connect indicates an expected call of Connect.
-func (mr *MockIWorkspaceMockRecorder) Connect(ctx, userName, connection interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockIWorkspace)(nil).Connect), ctx, userName, connection)
-}
-
 // Create mocks base method.
-func (m *MockIWorkspace) Create(ctx context.Context, userName values.UserName) error {
+func (m *MockIWorkspace) Create(ctx context.Context, userName values.UserName) (*domain.Workspace, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, userName)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*domain.Workspace)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
@@ -64,16 +51,30 @@ func (mr *MockIWorkspaceMockRecorder) Create(ctx, userName interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockIWorkspace)(nil).Create), ctx, userName)
 }
 
-// Remove mocks base method.
-func (m *MockIWorkspace) Remove(ctx context.Context, userName values.UserName) error {
+// Start mocks base method.
+func (m *MockIWorkspace) Start(ctx context.Context, workspace *domain.Workspace) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Remove", ctx, userName)
+	ret := m.ctrl.Call(m, "Start", ctx, workspace)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Remove indicates an expected call of Remove.
-func (mr *MockIWorkspaceMockRecorder) Remove(ctx, userName interface{}) *gomock.Call {
+// Start indicates an expected call of Start.
+func (mr *MockIWorkspaceMockRecorder) Start(ctx, workspace interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockIWorkspace)(nil).Remove), ctx, userName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockIWorkspace)(nil).Start), ctx, workspace)
+}
+
+// Stop mocks base method.
+func (m *MockIWorkspace) Stop(ctx context.Context, workspace *domain.Workspace) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Stop", ctx, workspace)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Stop indicates an expected call of Stop.
+func (mr *MockIWorkspaceMockRecorder) Stop(ctx, workspace interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockIWorkspace)(nil).Stop), ctx, workspace)
 }

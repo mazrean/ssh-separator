@@ -10,6 +10,7 @@ RUN \
   apt install -y --fix-missing \
   curl \
   wget \
+  netcat \
   git \
   python3 \
   python3-pip \

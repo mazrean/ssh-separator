@@ -11,21 +11,21 @@ func NewWorkspaceConnectionID(id string) WorkspaceConnectionID {
 }
 
 type WorkspaceIO struct {
-	writer io.Writer
-	reader io.Reader
+	writer io.WriteCloser
+	reader io.ReadCloser
 }
 
-func NewWorkspaceIO(writer io.Writer, reader io.Reader) *WorkspaceIO {
+func NewWorkspaceIO(writer io.WriteCloser, reader io.ReadCloser) *WorkspaceIO {
 	return &WorkspaceIO{
 		writer: writer,
 		reader: reader,
 	}
 }
 
-func (wio *WorkspaceIO) Writer() io.Writer {
+func (wio *WorkspaceIO) WriteCloser() io.WriteCloser {
 	return wio.writer
 }
 
-func (wio *WorkspaceIO) Reader() io.Reader {
+func (wio *WorkspaceIO) ReadCloser() io.ReadCloser {
 	return wio.reader
 }

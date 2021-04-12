@@ -22,10 +22,10 @@ func (wc *WorkspaceConnection) ID() values.WorkspaceConnectionID {
 	return wc.id
 }
 
-func (wc *WorkspaceConnection) Writer() io.Writer {
-	return wc.io.Writer()
+func (wc *WorkspaceConnection) WriteCloser() io.WriteCloser {
+	return wc.io.WriteCloser()
 }
 
-func (wc *WorkspaceConnection) Reader() io.Reader {
-	return wc.io.Reader()
+func (wc *WorkspaceConnection) ReadCloser() io.ReadCloser {
+	return wc.io.ReadCloser()
 }

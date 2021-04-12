@@ -44,7 +44,11 @@ func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *d
 		}
 	}
 
-	workspace.AddConnection()
+	err = workspace.AddConnection()
+	if err != nil {
+		return fmt.Errorf("failed to add connection: %w", err)
+	}
+
 	workspaceConnection, err := p.wwc.Connect(ctx, workspace)
 	if err != nil {
 		return fmt.Errorf("connect to workspace error: %w", err)
@@ -58,11 +62,14 @@ func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *d
 
 		err = workspace.RemoveConnection()
 		if err != nil {
-			log.Printf("connection num missmatch")
+			log.Printf("connection num missmatch: %+v", err)
 		}
 
 		if workspace.ConnectionNum() == 0 {
-			p.ww.Stop(ctx, workspace)
+			err = p.ww.Stop(ctx, workspace)
+			if err != nil {
+				log.Printf("failed to stop workspace: %+v", err)
+			}
 		}
 	}()
 

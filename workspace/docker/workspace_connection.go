@@ -5,8 +5,24 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/docker/docker/api/types"
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
+)
+
+var (
+	createOpts = types.ExecConfig{
+		User:         imageUser,
+		WorkingDir:   fmt.Sprintf("/home/%s", imageUser),
+		Cmd:          []string{imageCmd},
+		Tty:          true,
+		AttachStdin:  true,
+		AttachStdout: true,
+		AttachStderr: true,
+	}
+	attachOpts = types.ExecStartCheck{
+		Tty: true,
+	}
 )
 
 type WorkspaceConnection struct{}

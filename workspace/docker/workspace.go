@@ -32,11 +32,6 @@ var (
 	stopTimeout = 10 * time.Second
 )
 
-type containerInfo struct {
-	id         string
-	manageChan chan struct{}
-}
-
 func containerName(userName values.UserName) string {
 	return fmt.Sprintf("user-%s", userName)
 }

@@ -11,26 +11,30 @@ import (
 	"github.com/mazrean/separated-webshell/repository"
 	"github.com/mazrean/separated-webshell/service"
 	"github.com/mazrean/separated-webshell/ssh"
+	"github.com/mazrean/separated-webshell/store"
+	"github.com/mazrean/separated-webshell/store/gomap"
 	"github.com/mazrean/separated-webshell/workspace"
+	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
 // Injectors from wire.go:
 
 func InjectServer() (*Server, error) {
-	workspaceWorkspace, err := workspace.NewWorkspace()
+	workspace, err := docker.NewWorkspace()
 	if err != nil {
 		return nil, err
 	}
-	user := repository.NewUser()
+	gomapWorkspace := gomap.NewWorkspace()
 	transaction := repository.NewTransaction()
-	serviceUser, err := service.NewUser(workspaceWorkspace, user, transaction)
-	if err != nil {
-		return nil, err
-	}
+	user := repository.NewUser()
+	setup := service.NewSetup(workspace, gomapWorkspace, transaction, user)
+	serviceUser := service.NewUser(workspace, gomapWorkspace, user, transaction)
 	apiUser := api.NewUser(serviceUser)
 	apiAPI := api.NewAPI(apiUser)
-	sshSSH := ssh.NewSSH(serviceUser)
-	server, err := NewServer(apiAPI, sshSSH)
+	workspaceConnection := docker.NewWorkspaceConnection()
+	pipe := service.NewPipe(gomapWorkspace, workspaceConnection, workspace)
+	sshSSH := ssh.NewSSH(serviceUser, pipe)
+	server, err := NewServer(setup, apiAPI, sshSSH)
 	if err != nil {
 		return nil, err
 	}
@@ -40,20 +44,25 @@ func InjectServer() (*Server, error) {
 // wire.go:
 
 var (
-	transactionBind    = wire.Bind(new(repository.ITransaction), new(*repository.Transaction))
-	repositoryUserBind = wire.Bind(new(repository.IUser), new(*repository.User))
-	workspaceBind      = wire.Bind(new(workspace.IWorkspace), new(*workspace.Workspace))
-	serviceUserBind    = wire.Bind(new(service.IUser), new(*service.User))
+	transactionBind         = wire.Bind(new(repository.ITransaction), new(*repository.Transaction))
+	storeWorkspaceBind      = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))
+	repositoryUserBind      = wire.Bind(new(repository.IUser), new(*repository.User))
+	workspaceBind           = wire.Bind(new(workspace.IWorkspace), new(*docker.Workspace))
+	workspaceConnectionBind = wire.Bind(new(workspace.IWorkspaceConnection), new(*docker.WorkspaceConnection))
+	serviceUserBind         = wire.Bind(new(service.IUser), new(*service.User))
+	servicePipeBind         = wire.Bind(new(service.IPipe), new(*service.Pipe))
 )
 
 type Server struct {
+	*service.Setup
 	*api.API
 	*ssh.SSH
 }
 
-func NewServer(a *api.API, s *ssh.SSH) (*Server, error) {
+func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 	return &Server{
-		API: a,
-		SSH: s,
+		Setup: setup,
+		API:   a,
+		SSH:   s,
 	}, nil
 }

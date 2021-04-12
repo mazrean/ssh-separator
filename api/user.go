@@ -71,3 +71,41 @@ func (u *User) PostNewUser(c echo.Context) error {
 
 	return c.NoContent(http.StatusCreated)
 }
+
+type putResetRequest struct {
+	APIKey   string `json:"key" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+}
+
+func (u *User) PutReset(c echo.Context) error {
+	req := putResetRequest{}
+	err := c.Bind(&req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("failed to bind request: %w", err))
+	}
+
+	err = u.Validate.Struct(req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	if req.APIKey != apiKey {
+		return echo.NewHTTPError(http.StatusUnauthorized, "invalid api key")
+	}
+
+	userName, err := values.NewUserName(req.Name)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	user := domain.NewUser(userName)
+
+	err = u.User.ResetContainer(c.Request().Context(), user)
+	if errors.Is(err, service.ErrInvalidUser) {
+		return echo.NewHTTPError(http.StatusBadRequest, "no user")
+	}
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("failed to reset container: %w", err))
+	}
+
+	return nil
+}

@@ -44,7 +44,11 @@ func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *d
 		}
 	}
 
-	workspace.AddConnection()
+	err = workspace.AddConnection()
+	if err != nil {
+		return fmt.Errorf("failed to add connection: %w", err)
+	}
+
 	workspaceConnection, err := p.wwc.Connect(ctx, workspace)
 	if err != nil {
 		return fmt.Errorf("connect to workspace error: %w", err)

@@ -108,7 +108,12 @@ func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (
 		Image: imageRef,
 		User:  imageUser,
 		Tty:   true,
-	}, nil, nil, nil, ctnName)
+	}, &container.HostConfig{
+		Resources: container.Resources{
+			NanoCPUs: cpuLimit,
+			Memory:   memoryLimit,
+		},
+	}, nil, nil, ctnName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create container: %w", err)
 	}

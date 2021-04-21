@@ -14,6 +14,8 @@ jobs:
   image:
     name: Build Docker Image
     runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: 1
     steps:
       - name: Set IMAGE_TAG env
         run: echo "IMAGE_TAG=$(echo ${GITHUB_REF:11})" >> $GITHUB_ENV

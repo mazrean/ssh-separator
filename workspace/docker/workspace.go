@@ -16,7 +16,7 @@ import (
 
 var (
 	stopTimeout = 10 * time.Second
-	cpuLimit int64
+	cpuLimit    int64
 	memoryLimit int64
 )
 
@@ -51,7 +51,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 	}, &container.HostConfig{
 		Resources: container.Resources{
 			NanoCPUs: cpuLimit,
-			Memory: memoryLimit,
+			Memory:   memoryLimit,
 		},
 	}, nil, nil, ctnName)
 	if errdefs.IsConflict(err) {

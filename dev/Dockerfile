@@ -6,9 +6,8 @@ WORKDIR /app
 
 RUN apk add --update --no-cache gcc build-base
 
-RUN wget https://raw.githubusercontent.com/cosmtrek/air/master/install.sh && \
-  sh install.sh -b /go/bin && \
-  rm install.sh
+RUN --mount=type=cache,target=/root/.cache/go-build \
+  go install github.com/cosmtrek/air@v1.26.0
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
   go install github.com/go-delve/delve/cmd/dlv@v1.6.0

@@ -3,6 +3,8 @@ package docker
 import (
 	"context"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -14,6 +16,8 @@ import (
 
 var (
 	stopTimeout = 10 * time.Second
+	cpuLimit    int64
+	memoryLimit int64
 )
 
 func containerName(userName values.UserName) string {
@@ -23,6 +27,18 @@ func containerName(userName values.UserName) string {
 type Workspace struct{}
 
 func NewWorkspace() (*Workspace, error) {
+	floatCPULimit, err := strconv.ParseFloat(os.Getenv("CPU_LIMIT"), 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid cpu limit: %w", err)
+	}
+	cpuLimit = int64(floatCPULimit * 1e9)
+
+	floatMemoryLimit, err := strconv.ParseFloat(os.Getenv("MEMORY_LIMIT"), 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid memory limit: %w", err)
+	}
+	memoryLimit = int64(floatMemoryLimit * 1e6)
+
 	return &Workspace{}, nil
 }
 
@@ -32,7 +48,12 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 		Image: imageRef,
 		User:  imageUser,
 		Tty:   true,
-	}, nil, nil, nil, ctnName)
+	}, &container.HostConfig{
+		Resources: container.Resources{
+			NanoCPUs: cpuLimit,
+			Memory:   memoryLimit,
+		},
+	}, nil, nil, ctnName)
 	if errdefs.IsConflict(err) {
 		ctnInfo, err := cli.ContainerInspect(ctx, ctnName)
 		if err != nil {

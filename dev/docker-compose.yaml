@@ -12,7 +12,9 @@ services:
       IMAGE_URL: mazrean/cpctf-ubuntu:latest
       IMAGE_USER: ubuntu
       IMAGE_CMD: /bin/bash
-      API_KEY:
+      CPU_LIMIT: 0.1
+      MEMORY_LIMIT: 1024
+      API_KEY: api_key
     ports:
       - 2222:2222
       - 3000:3000

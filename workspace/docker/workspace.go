@@ -27,11 +27,11 @@ func containerName(userName values.UserName) string {
 type Workspace struct{}
 
 func NewWorkspace() (*Workspace, error) {
-	floatCpuLimit, err := strconv.ParseFloat(os.Getenv("CPU_LIMIT"), 64)
+	floatCPULimit, err := strconv.ParseFloat(os.Getenv("CPU_LIMIT"), 64)
 	if err != nil {
 		return nil, fmt.Errorf("invalid cpu limit: %w", err)
 	}
-	cpuLimit = int64(floatCpuLimit * 1e9)
+	cpuLimit = int64(floatCPULimit * 1e9)
 
 	floatMemoryLimit, err := strconv.ParseFloat(os.Getenv("MEMORY_LIMIT"), 64)
 	if err != nil {

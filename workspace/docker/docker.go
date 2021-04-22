@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	imageRef  string = os.Getenv("IMAGE_URL")
-	imageUser string = os.Getenv("IMAGE_USER")
-	imageCmd  string = os.Getenv("IMAGE_CMD")
-	cli       *client.Client
+	isLocalImage string = os.Getenv("LOCAL_IMAGE")
+	imageRef     string = os.Getenv("IMAGE_NAME")
+	imageUser    string = os.Getenv("IMAGE_USER")
+	imageCmd     string = os.Getenv("IMAGE_CMD")
+	cli          *client.Client
 )
 
 func Setup() error {
@@ -26,13 +27,15 @@ func Setup() error {
 
 	ctx := context.Background()
 
-	reader, err := cli.ImagePull(ctx, imageRef, types.ImagePullOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to pull image: %w", err)
-	}
-	_, err = io.Copy(os.Stdout, reader)
-	if err != nil {
-		return fmt.Errorf("failed to copy stdout: %w", err)
+	if len(isLocalImage) == 0 || isLocalImage == "false" {
+		reader, err := cli.ImagePull(ctx, imageRef, types.ImagePullOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to pull image: %w", err)
+		}
+		_, err = io.Copy(os.Stdout, reader)
+		if err != nil {
+			return fmt.Errorf("failed to copy stdout: %w", err)
+		}
 	}
 
 	return nil

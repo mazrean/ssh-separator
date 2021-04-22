@@ -5,12 +5,18 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/mazrean/separated-webshell/store"
 	"github.com/mazrean/separated-webshell/workspace"
+)
+
+var (
+	welcome = os.Getenv("WELCOME")
 )
 
 type IPipe interface {
@@ -81,6 +87,13 @@ func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *d
 	}()
 
 	if connection.IsTty() {
+		if len(welcome) != 0 {
+			_, err := io.Copy(connection.Stdout(), strings.NewReader(welcome))
+			if err != nil {
+				log.Printf("failed to copy fonts: %+v", err)
+			}
+		}
+
 		_, err := io.Copy(connection.Stdout(), workspaceConnection.ReadCloser())
 		if err != nil {
 			return fmt.Errorf("failed to copy stdin: %w", err)

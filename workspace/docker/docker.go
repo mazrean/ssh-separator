@@ -12,10 +12,10 @@ import (
 
 var (
 	isLocalImage string = os.Getenv("LOCAL_IMAGE")
-	imageRef  string = os.Getenv("IMAGE_NAME")
-	imageUser string = os.Getenv("IMAGE_USER")
-	imageCmd  string = os.Getenv("IMAGE_CMD")
-	cli       *client.Client
+	imageRef     string = os.Getenv("IMAGE_NAME")
+	imageUser    string = os.Getenv("IMAGE_USER")
+	imageCmd     string = os.Getenv("IMAGE_CMD")
+	cli          *client.Client
 )
 
 func Setup() error {

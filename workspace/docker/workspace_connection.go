@@ -61,3 +61,15 @@ func (wc *WorkspaceConnection) Disconnect(ctx context.Context, connection *domai
 
 	return nil
 }
+
+func (wc *WorkspaceConnection) Resize(ctx context.Context, connection *domain.WorkspaceConnection, window *values.Window) error {
+	err := cli.ContainerExecResize(ctx, string(connection.ID()), types.ResizeOptions{
+		Height: window.Height(),
+		Width:  window.Width(),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to resize: %w", err)
+	}
+
+	return nil
+}

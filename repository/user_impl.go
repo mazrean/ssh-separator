@@ -35,6 +35,7 @@ func (*User) Create(ctx context.Context, user *domain.User) error {
 	if err != nil {
 		return fmt.Errorf("failed to set password: %w", err)
 	}
+	userCounter.Inc()
 
 	return nil
 }

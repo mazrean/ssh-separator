@@ -12,6 +12,13 @@ import (
 	"github.com/docker/docker/errdefs"
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+)
+
+const (
+	upLabel   = "up"
+	downLabel = "down"
 )
 
 var (
@@ -19,6 +26,11 @@ var (
 	cpuLimit    int64
 	memoryLimit int64
 )
+
+var containerCounter = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	Namespace: "webshell",
+	Name:      "container_counter",
+}, []string{"status"})
 
 func containerName(userName values.UserName) string {
 	return fmt.Sprintf("user-%s", userName)
@@ -62,6 +74,8 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 
 		workspaceID := values.NewWorkspaceID(ctnInfo.ID)
 		workspaceName := values.NewWorkspaceName(ctnName)
+		containerCounter.WithLabelValues(downLabel).Inc()
+
 		return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
 	}
 	if err != nil {
@@ -70,6 +84,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 
 	workspaceID := values.NewWorkspaceID(res.ID)
 	workspaceName := values.NewWorkspaceName(ctnName)
+	containerCounter.WithLabelValues(downLabel).Inc()
 
 	return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
 }
@@ -80,6 +95,8 @@ func (w *Workspace) Start(ctx context.Context, workspace *domain.Workspace) erro
 		return fmt.Errorf("failed to start container: %w", err)
 	}
 	workspace.Status = values.StatusUp
+	containerCounter.WithLabelValues(downLabel).Dec()
+	containerCounter.WithLabelValues(upLabel).Inc()
 
 	return nil
 }
@@ -90,6 +107,8 @@ func (w *Workspace) Stop(ctx context.Context, workspace *domain.Workspace) error
 		return fmt.Errorf("failed to stop container: %w", err)
 	}
 	workspace.Status = values.StatusDown
+	containerCounter.WithLabelValues(upLabel).Dec()
+	containerCounter.WithLabelValues(downLabel).Inc()
 
 	return nil
 }
@@ -101,6 +120,8 @@ func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to remove container: %w", err)
 	}
+	containerCounter.WithLabelValues(upLabel).Dec()
+	containerCounter.WithLabelValues(downLabel).Inc()
 
 	userName := workspace.UserName()
 	ctnName := string(workspace.Name())
@@ -117,6 +138,8 @@ func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to create container: %w", err)
 	}
+	containerCounter.WithLabelValues(downLabel).Dec()
+	containerCounter.WithLabelValues(upLabel).Inc()
 
 	workspaceID := values.NewWorkspaceID(res.ID)
 	workspaceName := values.NewWorkspaceName(ctnName)

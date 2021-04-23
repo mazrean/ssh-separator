@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	upLabel = "up"
+	upLabel   = "up"
 	downLabel = "down"
 )
 

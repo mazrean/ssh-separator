@@ -3,9 +3,16 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mazrean/separated-webshell/api/middlewares"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+)
+
+var (
+	prometheus = os.Getenv("PROMETHEUS")
 )
 
 type API struct {
@@ -63,6 +70,11 @@ func (api *API) Start(port int) error {
 				e.Logger.Error(err)
 			}
 		}
+	}
+
+	if prometheus == "true" {
+		e.Use(middlewares.RequestCounter())
+		e.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 	}
 
 	e.POST("/new", api.User.PostNewUser)

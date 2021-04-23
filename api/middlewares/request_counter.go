@@ -9,7 +9,7 @@ import (
 )
 
 var requestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
-	Namespace: "scoreserver",
+	Namespace: "webshell",
 	Name:      "http_requests_total",
 }, []string{"code", "method"})
 

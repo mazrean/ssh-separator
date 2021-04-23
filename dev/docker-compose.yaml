@@ -6,10 +6,18 @@ services:
       context: ..
       dockerfile: dev/Dockerfile
     environment:
+      WELCOME: "\n
+         ██████╗██████╗  ██████╗████████╗███████╗██████╗  ██████╗ ██████╗  ██╗\n
+        ██╔════╝██╔══██╗██╔════╝╚══██╔══╝██╔════╝╚════██╗██╔═████╗╚════██╗███║\n
+        ██║     ██████╔╝██║        ██║   █████╗   █████╔╝██║██╔██║ █████╔╝╚██║\n
+        ██║     ██╔═══╝ ██║        ██║   ██╔══╝  ██╔═══╝ ████╔╝██║██╔═══╝  ██║\n
+        ╚██████╗██║     ╚██████╗   ██║   ██║     ███████╗╚██████╔╝███████╗ ██║\n
+        ╚═════╝╚═╝      ╚═════╝   ╚═╝   ╚═╝     ╚══════╝ ╚═════╝ ╚══════╝ ╚═╝\n
+        \n"
       API_PORT: 3000
       SSH_PORT: 2222
       BADGER_DIR: /tmp/badger
-      IMAGE_URL: mazrean/cpctf-ubuntu:latest
+      IMAGE_NAME: mazrean/cpctf-ubuntu:latest
       IMAGE_USER: ubuntu
       IMAGE_CMD: /bin/bash
       CPU_LIMIT: 0.1

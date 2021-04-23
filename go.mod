@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/Microsoft/go-winio v0.4.16 // indirect
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
+	github.com/common-nighthawk/go-figure v0.0.0-20200609044655-c4b36f998cf2
 	github.com/containerd/containerd v1.4.4 // indirect
 	github.com/dgraph-io/badger/v3 v3.2011.1
 	github.com/docker/distribution v2.7.1+incompatible // indirect

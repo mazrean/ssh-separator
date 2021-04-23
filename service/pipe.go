@@ -60,6 +60,8 @@ func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *d
 		return fmt.Errorf("connect to workspace error: %w", err)
 	}
 	defer func() {
+		ctx := context.Background()
+
 		err := p.wwc.Disconnect(ctx, workspaceConnection)
 		if err != nil {
 			log.Printf("failed to disconnect: %+v", err)
@@ -80,29 +82,39 @@ func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *d
 	}()
 
 	go func() {
-		_, err := io.Copy(workspaceConnection.WriteCloser(), connection.Stdin())
-		if err != nil {
-			log.Printf("failed to copy stdin: %+v", err)
+		for win := range connection.WindowReceiver() {
+			err := p.wwc.Resize(ctx, workspaceConnection, win)
+			if err != nil {
+				log.Printf("failed to resize window: %+v", err)
+			}
 		}
 	}()
 
-	if connection.IsTty() {
-		if len(welcome) != 0 {
-			_, err := io.Copy(connection.Stdout(), strings.NewReader(welcome))
+	go func() {
+		defer connection.Close()
+		if connection.IsTty() {
+			if len(welcome) != 0 {
+				_, err := io.Copy(connection.Stdout(), strings.NewReader(welcome))
+				if err != nil {
+					log.Printf("failed to copy fonts: %+v", err)
+				}
+			}
+
+			_, err := io.Copy(connection.Stdout(), workspaceConnection.ReadCloser())
 			if err != nil {
-				log.Printf("failed to copy fonts: %+v", err)
+				log.Printf("failed to copy stdin: %+v\n", err)
+			}
+		} else {
+			_, err := stdcopy.StdCopy(connection.Stdout(), connection.Stderr(), workspaceConnection.ReadCloser())
+			if err != nil {
+				log.Printf("failed to copy stdout: %+v\n", err)
 			}
 		}
+	}()
 
-		_, err := io.Copy(connection.Stdout(), workspaceConnection.ReadCloser())
-		if err != nil {
-			return fmt.Errorf("failed to copy stdin: %w", err)
-		}
-	} else {
-		_, err := stdcopy.StdCopy(connection.Stdout(), connection.Stderr(), workspaceConnection.ReadCloser())
-		if err != nil {
-			return fmt.Errorf("failed to copy stdout: %w", err)
-		}
+	_, err = io.Copy(workspaceConnection.WriteCloser(), connection.Stdin())
+	if err != nil {
+		return fmt.Errorf("failed to copy stdin: %+v", err)
 	}
 
 	return nil

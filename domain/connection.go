@@ -36,6 +36,10 @@ func (c *Connection) Stderr() io.Writer {
 	return c.io.Stdout()
 }
 
+func (c *Connection) Close() error {
+	return c.io.Close()
+}
+
 func (c *Connection) WindowSender() chan<- *values.Window {
 	return c.windowPipe
 }

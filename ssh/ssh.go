@@ -8,7 +8,14 @@ import (
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/mazrean/separated-webshell/service"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
+
+var connectionCounter = promauto.NewGauge(prometheus.GaugeOpts{
+	Namespace: "webshell",
+	Name:      "ssh_connection_counter",
+})
 
 type SSH struct {
 	service.IUser
@@ -45,9 +52,10 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 			}
 		}()
 		_, winCh, isTty := s.Pty()
-		tty := values.NewConnectionIO(s, s, s)
+		tty := values.NewConnectionIO(s, s, s, s.Close)
 		connection := domain.NewConnection(isTty, tty)
 		newWinCh := connection.WindowSender()
+		defer close(newWinCh)
 		if isTty {
 			go func(winCh <-chan ssh.Window, newWinCh chan<- *values.Window) {
 				for win := range winCh {
@@ -62,6 +70,8 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 			return
 		}
 
+		connectionCounter.Inc()
+		defer connectionCounter.Dec()
 		err = pipe.Pipe(s.Context(), userName, connection)
 		if err != nil {
 			log.Printf("failed in ssh: %+v\n", err)

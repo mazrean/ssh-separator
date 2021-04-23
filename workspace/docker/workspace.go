@@ -74,6 +74,8 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 
 		workspaceID := values.NewWorkspaceID(ctnInfo.ID)
 		workspaceName := values.NewWorkspaceName(ctnName)
+		containerCounter.WithLabelValues(downLabel).Inc()
+
 		return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
 	}
 	if err != nil {

@@ -32,6 +32,7 @@ func Setup() (*badger.DB, error) {
 		opts := badger.DefaultIteratorOptions
 		opts.PrefetchSize = runtime.NumCPU()
 		it := txn.NewIterator(opts)
+		defer it.Close()
 
 		for it.Rewind(); it.Valid(); it.Next() {
 			userCounter.Inc()

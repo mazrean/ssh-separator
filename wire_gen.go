@@ -20,14 +20,18 @@ import (
 
 // Injectors from wire.go:
 
-func InjectServer() (*Server, error) {
+func InjectServer() (*Server, func(), error) {
 	workspace, err := docker.NewWorkspace()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	gomapWorkspace := gomap.NewWorkspace()
-	transaction := badger.NewTransaction()
-	user := badger.NewUser()
+	db, cleanup, err := badger.NewDB()
+	if err != nil {
+		return nil, nil, err
+	}
+	transaction := badger.NewTransaction(db)
+	user := badger.NewUser(db)
 	setup := service.NewSetup(workspace, gomapWorkspace, transaction, user)
 	serviceUser := service.NewUser(workspace, gomapWorkspace, user, transaction)
 	apiUser := api.NewUser(serviceUser)
@@ -37,9 +41,12 @@ func InjectServer() (*Server, error) {
 	sshSSH := ssh.NewSSH(serviceUser, pipe)
 	server, err := NewServer(setup, apiAPI, sshSSH)
 	if err != nil {
-		return nil, err
+		cleanup()
+		return nil, nil, err
 	}
-	return server, nil
+	return server, func() {
+		cleanup()
+	}, nil
 }
 
 // wire.go:

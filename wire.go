@@ -39,12 +39,13 @@ func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 	}, nil
 }
 
-func InjectServer() (*Server, error) {
+func InjectServer() (*Server, func(), error) {
 	wire.Build(
 		NewServer,
 		api.NewAPI,
 		api.NewUser,
 		gomap.NewWorkspace,
+		badger.NewDB,
 		badger.NewTransaction,
 		badger.NewUser,
 		service.NewSetup,
@@ -62,5 +63,5 @@ func InjectServer() (*Server, error) {
 		servicePipeBind,
 	)
 
-	return nil, nil
+	return nil, nil, nil
 }

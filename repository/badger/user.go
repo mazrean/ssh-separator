@@ -12,13 +12,17 @@ import (
 	"github.com/mazrean/separated-webshell/repository"
 )
 
-type User struct{}
-
-func NewUser() *User {
-	return &User{}
+type User struct{
+	db *DB
 }
 
-func (*User) Create(ctx context.Context, user *domain.User) error {
+func NewUser(db *DB) *User {
+	return &User{
+		db: db,
+	}
+}
+
+func (u *User) Create(ctx context.Context, user *domain.User) error {
 	txn, err := getTransaction(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get transaction: %w", err)
@@ -36,7 +40,7 @@ func (*User) Create(ctx context.Context, user *domain.User) error {
 	if err != nil {
 		return fmt.Errorf("failed to set password: %w", err)
 	}
-	userCounter.Inc()
+	u.db.userCounter.Inc()
 
 	return nil
 }

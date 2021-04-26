@@ -5,7 +5,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
@@ -23,16 +22,11 @@ func main() {
 		panic(err)
 	}
 
-	db, err := badger.Setup()
+	server, close, err := InjectServer()
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
-
-	server, err := InjectServer()
-	if err != nil {
-		panic(err)
-	}
+	defer close()
 
 	err = docker.Setup()
 	if err != nil {

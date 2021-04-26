@@ -9,14 +9,18 @@ import (
 	ctxManager "github.com/mazrean/separated-webshell/pkg/context"
 )
 
-type Transaction struct{}
-
-func NewTransaction() *Transaction {
-	return &Transaction{}
+type Transaction struct{
+	db *DB
 }
 
-func (*Transaction) Transaction(ctx context.Context, fn func(ctx context.Context) error) error {
-	err := db.Update(func(txn *badger.Txn) error {
+func NewTransaction(db *DB ) *Transaction {
+	return &Transaction{
+		db: db,
+	}
+}
+
+func (t *Transaction) Transaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	err := t.db.DB.Update(func(txn *badger.Txn) error {
 		ctx := context.WithValue(ctx, ctxManager.TransactionKey, txn)
 
 		return fn(ctx)
@@ -28,8 +32,8 @@ func (*Transaction) Transaction(ctx context.Context, fn func(ctx context.Context
 	return nil
 }
 
-func (*Transaction) RTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
-	err := db.View(func(txn *badger.Txn) error {
+func (t *Transaction) RTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	err := t.db.DB.View(func(txn *badger.Txn) error {
 		ctx := context.WithValue(ctx, ctxManager.TransactionKey, txn)
 
 		return fn(ctx)

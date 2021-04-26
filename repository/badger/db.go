@@ -10,23 +10,25 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
-var (
-	db *badger.DB
-)
+type DB struct {
+	DB *badger.DB
+	userCounter prometheus.Counter
+}
 
-var userCounter = promauto.NewCounter(prometheus.CounterOpts{
-	Namespace: "webshell",
-	Name:      "user_counter",
-})
+func NewDB() (*DB, func(), error) {
+	return newDB(os.Getenv("BADGER_DIR"), "webshell")
+}
 
-func Setup() (*badger.DB, error) {
-	dir := os.Getenv("BADGER_DIR")
-
-	var err error
-	db, err = badger.Open(badger.DefaultOptions(dir))
+func newDB(dir string, prometheusNameSpace string) (*DB, func(), error) {
+	db, err := badger.Open(badger.DefaultOptions(dir))
 	if err != nil {
-		return nil, fmt.Errorf("failed to open db file: %w", err)
+		return nil, nil, fmt.Errorf("failed to open db file: %w", err)
 	}
+
+	userCounter := promauto.NewCounter(prometheus.CounterOpts{
+		Namespace: prometheusNameSpace,
+		Name:      "user_counter",
+	})
 
 	err = db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -41,8 +43,11 @@ func Setup() (*badger.DB, error) {
 		return nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed in transaction: %w", err)
+		return nil, nil, fmt.Errorf("failed in transaction: %w", err)
 	}
 
-	return db, nil
+	return &DB{
+		DB: db,
+		userCounter: userCounter,
+	}, func(){db.Close()}, nil
 }

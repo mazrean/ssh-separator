@@ -9,6 +9,7 @@ import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
 	"github.com/mazrean/separated-webshell/repository"
+	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/service"
 	"github.com/mazrean/separated-webshell/ssh"
 	"github.com/mazrean/separated-webshell/store"
@@ -25,8 +26,8 @@ func InjectServer() (*Server, error) {
 		return nil, err
 	}
 	gomapWorkspace := gomap.NewWorkspace()
-	transaction := repository.NewTransaction()
-	user := repository.NewUser()
+	transaction := badger.NewTransaction()
+	user := badger.NewUser()
 	setup := service.NewSetup(workspace, gomapWorkspace, transaction, user)
 	serviceUser := service.NewUser(workspace, gomapWorkspace, user, transaction)
 	apiUser := api.NewUser(serviceUser)
@@ -44,9 +45,9 @@ func InjectServer() (*Server, error) {
 // wire.go:
 
 var (
-	transactionBind         = wire.Bind(new(repository.ITransaction), new(*repository.Transaction))
+	transactionBind         = wire.Bind(new(repository.ITransaction), new(*badger.Transaction))
 	storeWorkspaceBind      = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))
-	repositoryUserBind      = wire.Bind(new(repository.IUser), new(*repository.User))
+	repositoryUserBind      = wire.Bind(new(repository.IUser), new(*badger.User))
 	workspaceBind           = wire.Bind(new(workspace.IWorkspace), new(*docker.Workspace))
 	workspaceConnectionBind = wire.Bind(new(workspace.IWorkspaceConnection), new(*docker.WorkspaceConnection))
 	serviceUserBind         = wire.Bind(new(service.IUser), new(*service.User))

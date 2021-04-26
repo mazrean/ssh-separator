@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/mazrean/separated-webshell/repository"
+	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
@@ -23,7 +23,7 @@ func main() {
 		panic(err)
 	}
 
-	db, err := repository.Setup()
+	db, err := badger.Setup()
 	if err != nil {
 		panic(err)
 	}

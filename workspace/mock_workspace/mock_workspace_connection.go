@@ -10,6 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/mazrean/separated-webshell/domain"
+	values "github.com/mazrean/separated-webshell/domain/values"
 )
 
 // MockIWorkspaceConnection is a mock of IWorkspaceConnection interface.
@@ -62,4 +63,18 @@ func (m *MockIWorkspaceConnection) Disconnect(ctx context.Context, connection *d
 func (mr *MockIWorkspaceConnectionMockRecorder) Disconnect(ctx, connection interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Disconnect", reflect.TypeOf((*MockIWorkspaceConnection)(nil).Disconnect), ctx, connection)
+}
+
+// Resize mocks base method.
+func (m *MockIWorkspaceConnection) Resize(ctx context.Context, connection *domain.WorkspaceConnection, window *values.Window) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Resize", ctx, connection, window)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Resize indicates an expected call of Resize.
+func (mr *MockIWorkspaceConnectionMockRecorder) Resize(ctx, connection, window interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Resize", reflect.TypeOf((*MockIWorkspaceConnection)(nil).Resize), ctx, connection, window)
 }

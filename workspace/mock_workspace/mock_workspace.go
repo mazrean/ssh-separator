@@ -51,6 +51,21 @@ func (mr *MockIWorkspaceMockRecorder) Create(ctx, userName interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockIWorkspace)(nil).Create), ctx, userName)
 }
 
+// Recreate mocks base method.
+func (m *MockIWorkspace) Recreate(ctx context.Context, workspace *domain.Workspace) (*domain.Workspace, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Recreate", ctx, workspace)
+	ret0, _ := ret[0].(*domain.Workspace)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Recreate indicates an expected call of Recreate.
+func (mr *MockIWorkspaceMockRecorder) Recreate(ctx, workspace interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recreate", reflect.TypeOf((*MockIWorkspace)(nil).Recreate), ctx, workspace)
+}
+
 // Start mocks base method.
 func (m *MockIWorkspace) Start(ctx context.Context, workspace *domain.Workspace) error {
 	m.ctrl.T.Helper()

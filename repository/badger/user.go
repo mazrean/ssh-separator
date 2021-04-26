@@ -1,4 +1,4 @@
-package repository
+package badger
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
+	"github.com/mazrean/separated-webshell/repository"
 )
 
 type User struct{}
@@ -28,7 +29,7 @@ func (*User) Create(ctx context.Context, user *domain.User) error {
 
 	_, err = txn.Get([]byte(user.GetName()))
 	if err == nil || !errors.Is(err, badger.ErrKeyNotFound) {
-		return ErrUserExist
+		return repository.ErrUserExist
 	}
 
 	err = txn.Set([]byte(user.GetName()), []byte(user.HashedPassword))

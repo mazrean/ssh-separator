@@ -4,3 +4,4 @@ key.pub
 /badger
 tmp
 .vscode
+test_*

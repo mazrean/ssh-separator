@@ -9,6 +9,7 @@ import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
 	"github.com/mazrean/separated-webshell/repository"
+	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/service"
 	"github.com/mazrean/separated-webshell/ssh"
 	"github.com/mazrean/separated-webshell/store"
@@ -19,14 +20,18 @@ import (
 
 // Injectors from wire.go:
 
-func InjectServer() (*Server, error) {
+func InjectServer() (*Server, func(), error) {
 	workspace, err := docker.NewWorkspace()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	gomapWorkspace := gomap.NewWorkspace()
-	transaction := repository.NewTransaction()
-	user := repository.NewUser()
+	db, cleanup, err := badger.NewDB()
+	if err != nil {
+		return nil, nil, err
+	}
+	transaction := badger.NewTransaction(db)
+	user := badger.NewUser(db)
 	setup := service.NewSetup(workspace, gomapWorkspace, transaction, user)
 	serviceUser := service.NewUser(workspace, gomapWorkspace, user, transaction)
 	apiUser := api.NewUser(serviceUser)
@@ -36,17 +41,20 @@ func InjectServer() (*Server, error) {
 	sshSSH := ssh.NewSSH(serviceUser, pipe)
 	server, err := NewServer(setup, apiAPI, sshSSH)
 	if err != nil {
-		return nil, err
+		cleanup()
+		return nil, nil, err
 	}
-	return server, nil
+	return server, func() {
+		cleanup()
+	}, nil
 }
 
 // wire.go:
 
 var (
-	transactionBind         = wire.Bind(new(repository.ITransaction), new(*repository.Transaction))
+	transactionBind         = wire.Bind(new(repository.ITransaction), new(*badger.Transaction))
 	storeWorkspaceBind      = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))
-	repositoryUserBind      = wire.Bind(new(repository.IUser), new(*repository.User))
+	repositoryUserBind      = wire.Bind(new(repository.IUser), new(*badger.User))
 	workspaceBind           = wire.Bind(new(workspace.IWorkspace), new(*docker.Workspace))
 	workspaceConnectionBind = wire.Bind(new(workspace.IWorkspaceConnection), new(*docker.WorkspaceConnection))
 	serviceUserBind         = wire.Bind(new(service.IUser), new(*service.User))

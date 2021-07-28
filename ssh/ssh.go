@@ -36,7 +36,7 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 			return false
 		}
 
-		isOK, err := user.Auth(ctx, domain.NewUserWithPassword(userName, pw))
+		isOK, err := user.Auth(ctx, userName, pw)
 		if err != nil || !isOK {
 			log.Printf("ssh login error: %+v\n", err)
 			return false

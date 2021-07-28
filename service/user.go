@@ -16,9 +16,9 @@ import (
 )
 
 type IUser interface {
-	New(ctx context.Context, user *domain.User) error
-	ResetContainer(ctx context.Context, user *domain.User) error
-	Auth(ctx context.Context, user *domain.User) (bool, error)
+	New(ctx context.Context, name values.UserName, password values.Password) error
+	ResetContainer(ctx context.Context, userName values.UserName) error
+	Auth(ctx context.Context, name values.UserName, password values.Password) (bool, error)
 }
 
 type User struct {
@@ -42,8 +42,8 @@ var (
 	ErrWorkspaceExist = errors.New("workspace exist")
 )
 
-func (u *User) New(ctx context.Context, user *domain.User) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+func (u *User) New(ctx context.Context, name values.UserName, password values.Password) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		return fmt.Errorf("failed to hash password")
 	}
@@ -53,7 +53,7 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 		return fmt.Errorf("failed in HashedPassword constructor: %w", err)
 	}
 
-	user.HashedPassword = newHashedPassword
+	user := domain.NewUser(name, newHashedPassword)
 
 	err = u.rt.Transaction(ctx, func(ctx context.Context) error {
 		err := u.ru.Create(ctx, user)
@@ -86,8 +86,8 @@ func (u *User) New(ctx context.Context, user *domain.User) error {
 	return nil
 }
 
-func (u *User) ResetContainer(ctx context.Context, user *domain.User) error {
-	workspace, err := u.sw.Get(ctx, user.GetName())
+func (u *User) ResetContainer(ctx context.Context, userName values.UserName) error {
+	workspace, err := u.sw.Get(ctx, userName)
 	if err != nil {
 		return ErrInvalidUser
 	}
@@ -97,7 +97,7 @@ func (u *User) ResetContainer(ctx context.Context, user *domain.User) error {
 		return fmt.Errorf("failed to recreate workspace: %w", err)
 	}
 
-	err = u.sw.Set(ctx, user.GetName(), workspace)
+	err = u.sw.Set(ctx, userName, workspace)
 	if err != nil {
 		return fmt.Errorf("failed to set workspace: %w", err)
 	}
@@ -110,11 +110,11 @@ var (
 	ErrIncorrectPassword = errors.New("incorrect password")
 )
 
-func (u *User) Auth(ctx context.Context, user *domain.User) (bool, error) {
+func (u *User) Auth(ctx context.Context, name values.UserName, password values.Password) (bool, error) {
 	var hashedPassword values.HashedPassword
 	err := u.rt.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
-		hashedPassword, err = u.ru.GetPassword(ctx, user.GetName())
+		hashedPassword, err = u.ru.GetPassword(ctx, name)
 		if errors.Is(err, repository.ErrUserNotExist) {
 			return ErrInvalidUser
 		}
@@ -128,7 +128,7 @@ func (u *User) Auth(ctx context.Context, user *domain.User) (bool, error) {
 		return false, fmt.Errorf("failed in transaction: %w", err)
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(user.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 		return false, ErrIncorrectPassword
 	}

@@ -34,5 +34,9 @@ func NewPassword(password string) (Password, error) {
 }
 
 func NewHashedPassword(hashedPassword string) (HashedPassword, error) {
+	if hashedPassword == "" {
+		return "", errors.New("invalid hashed password")
+	}
+
 	return HashedPassword(hashedPassword), nil
 }

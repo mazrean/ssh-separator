@@ -63,3 +63,17 @@ func (mr *MockIUserMockRecorder) New(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockIUser)(nil).New), ctx, user)
 }
+
+// ResetContainer mocks base method.
+func (m *MockIUser) ResetContainer(ctx context.Context, user *domain.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetContainer", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetContainer indicates an expected call of ResetContainer.
+func (mr *MockIUserMockRecorder) ResetContainer(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetContainer", reflect.TypeOf((*MockIUser)(nil).ResetContainer), ctx, user)
+}

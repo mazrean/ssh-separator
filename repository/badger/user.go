@@ -1,4 +1,4 @@
-package repository
+package badger
 
 import (
 	"context"
@@ -9,15 +9,20 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
+	"github.com/mazrean/separated-webshell/repository"
 )
 
-type User struct{}
-
-func NewUser() *User {
-	return &User{}
+type User struct {
+	db *DB
 }
 
-func (*User) Create(ctx context.Context, user *domain.User) error {
+func NewUser(db *DB) *User {
+	return &User{
+		db: db,
+	}
+}
+
+func (u *User) Create(ctx context.Context, user *domain.User) error {
 	txn, err := getTransaction(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get transaction: %w", err)
@@ -28,14 +33,18 @@ func (*User) Create(ctx context.Context, user *domain.User) error {
 
 	_, err = txn.Get([]byte(user.GetName()))
 	if err == nil || !errors.Is(err, badger.ErrKeyNotFound) {
-		return ErrUserExist
+		return repository.ErrUserExist
+	}
+
+	if user.HashedPassword == "" {
+		return repository.ErrUserPasswordEmpty
 	}
 
 	err = txn.Set([]byte(user.GetName()), []byte(user.HashedPassword))
 	if err != nil {
 		return fmt.Errorf("failed to set password: %w", err)
 	}
-	userCounter.Inc()
+	u.db.userCounter.Inc()
 
 	return nil
 }

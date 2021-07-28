@@ -1,6 +1,7 @@
 key
 key.pub
 .env
-badger
+/badger
 tmp
 .vscode
+test_*

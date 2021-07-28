@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	ErrUserPasswordEmpty = errors.New("password is empty")
 	ErrUserExist    = errors.New("user exist error")
 	ErrUserNotExist = errors.New("user not exist error")
 )

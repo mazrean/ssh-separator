@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/mazrean/separated-webshell/service"
 )
@@ -61,7 +60,7 @@ func (u *User) PostNewUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	err = u.User.New(c.Request().Context(), domain.NewUserWithPassword(userName, password))
+	err = u.User.New(c.Request().Context(), userName, password)
 	if errors.Is(err, service.ErrUserExist) {
 		return echo.NewHTTPError(http.StatusBadRequest, "user already exist")
 	}
@@ -97,9 +96,8 @@ func (u *User) PutReset(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
-	user := domain.NewUser(userName)
 
-	err = u.User.ResetContainer(c.Request().Context(), user)
+	err = u.User.ResetContainer(c.Request().Context(), userName)
 	if errors.Is(err, service.ErrInvalidUser) {
 		return echo.NewHTTPError(http.StatusBadRequest, "no user")
 	}

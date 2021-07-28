@@ -18,6 +18,7 @@ func TestUser(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Create", testCreate)
+	t.Run("GetPassword", testGetPassword)
 }
 
 func testCreate(t *testing.T) {
@@ -154,6 +155,123 @@ func testCreate(t *testing.T) {
 					return nil
 				})
 				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func testGetPassword(t *testing.T) {
+	t.Parallel()
+
+	db, close, err := newTestDB("user_get_password")
+	if err != nil {
+		t.Errorf("failed to create test db: %w", err)
+	}
+	defer close()
+
+	user := NewUser(db)
+
+	testUserNames := make([]values.UserName, 0, 4)
+	for i := 0; i < 4; i++ {
+		testUserName, err := values.NewUserName(fmt.Sprintf("user_%d", i))
+		if err != nil {
+			t.Errorf("failed to create test user name: %w", err)
+		}
+
+		testUserNames = append(testUserNames, testUserName)
+	}
+
+	testHashedPassword, err := values.NewHashedPassword("$2a$10$hgaZ4iV9VYb9xHOLF/Bu4utNbulE5kVu0akP3u7.5xo/dh5q2o.YC")
+	if err != nil {
+		t.Errorf("failed to create test hashed password: %w", err)
+	}
+
+	tests := []struct {
+		description string
+		txnType transactionType
+		userName values.UserName
+		password values.HashedPassword
+		sameTxn bool
+		isErr bool
+		err error
+	}{
+		{
+			description: "read transaction",
+			txnType:     read,
+			userName:    testUserNames[0],
+			password:    testHashedPassword,
+		},
+		{
+			description: "write transaction",
+			txnType:     write,
+			userName:    testUserNames[1],
+			password:    testHashedPassword,
+		},
+		{
+			description: "no transaction",
+			txnType:     none,
+			userName:    testUserNames[2],
+			password:    testHashedPassword,
+			isErr:       true,
+		},
+		{
+			description: "write transaction",
+			txnType:     write,
+			userName:    testUserNames[3],
+			password:    testHashedPassword,
+			sameTxn:     true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := context.Background()
+
+			if !test.sameTxn {
+				err := db.DB.Update(func(txn *badger.Txn) error {
+					err := txn.Set([]byte(test.userName), []byte(test.password))
+					if err != nil {
+						return fmt.Errorf("failed to set user password: %w", err)
+					}
+
+					return nil
+				})
+				if err != nil {
+					t.Errorf("failed to set user password: %w", err)
+				}
+			}
+
+			var txn *badger.Txn
+			switch test.txnType {
+			case read:
+				txn = db.DB.NewTransaction(false)
+				defer txn.Discard()
+			case write:
+				txn = db.DB.NewTransaction(true)
+				defer txn.Discard()
+			}
+
+			ctx = context.WithValue(ctx, ctxManager.TransactionKey, txn)
+
+			if test.sameTxn {
+				err := txn.Set([]byte(test.userName), []byte(test.password))
+				if err != nil {
+					t.Errorf("failed to set user password: %w", err)
+				}
+			}
+
+			password, err := user.GetPassword(ctx, test.userName)
+
+			if !test.isErr {
+				assert.NoError(t, err)
+
+				assert.Equal(t, test.password, password)
+			} else {
+				assert.Error(t, err)
+
+				if test.err != nil && !errors.Is(err, test.err) {
+					t.Errorf("expected error %+v, got %+v", test.err, err)
+				}
 			}
 		})
 	}

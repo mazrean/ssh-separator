@@ -19,6 +19,13 @@ func NewTransaction(db *DB ) *Transaction {
 	}
 }
 
+type transactionType int
+const (
+	read transactionType = iota
+	write
+	none
+)
+
 func (t *Transaction) Transaction(ctx context.Context, fn func(ctx context.Context) error) error {
 	err := t.db.DB.Update(func(txn *badger.Txn) error {
 		ctx := context.WithValue(ctx, ctxManager.TransactionKey, txn)

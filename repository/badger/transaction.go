@@ -9,17 +9,18 @@ import (
 	ctxManager "github.com/mazrean/separated-webshell/pkg/context"
 )
 
-type Transaction struct{
+type Transaction struct {
 	db *DB
 }
 
-func NewTransaction(db *DB ) *Transaction {
+func NewTransaction(db *DB) *Transaction {
 	return &Transaction{
 		db: db,
 	}
 }
 
 type transactionType int
+
 const (
 	read transactionType = iota
 	write

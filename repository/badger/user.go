@@ -12,7 +12,7 @@ import (
 	"github.com/mazrean/separated-webshell/repository"
 )
 
-type User struct{
+type User struct {
 	db *DB
 }
 

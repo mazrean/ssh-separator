@@ -11,7 +11,7 @@ import (
 )
 
 type DB struct {
-	DB *badger.DB
+	DB          *badger.DB
 	userCounter prometheus.Counter
 }
 
@@ -47,7 +47,7 @@ func newDB(dir string, prometheusNameSpace string) (*DB, func(), error) {
 	}
 
 	return &DB{
-		DB: db,
+		DB:          db,
 		userCounter: userCounter,
-	}, func(){db.Close()}, nil
+	}, func() { db.Close() }, nil
 }

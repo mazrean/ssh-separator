@@ -32,15 +32,15 @@ func testTransaction(t *testing.T) {
 
 	testErr := errors.New("test error")
 
-	tests := []struct{
+	tests := []struct {
 		description string
-		ctx context.Context
-		fn func(context.Context) error
-		err error
+		ctx         context.Context
+		fn          func(context.Context) error
+		err         error
 	}{
 		{
 			description: "no error(no proccess)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				return nil
 			},
@@ -48,7 +48,7 @@ func testTransaction(t *testing.T) {
 		},
 		{
 			description: "error(error in func)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				return testErr
 			},
@@ -56,7 +56,7 @@ func testTransaction(t *testing.T) {
 		},
 		{
 			description: "no error(get transaction)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				iTxn := ctx.Value(ctxManager.TransactionKey)
 				if iTxn == nil {
@@ -74,7 +74,7 @@ func testTransaction(t *testing.T) {
 		},
 		{
 			description: "no error(getTransaction)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				_, err := getTransaction(ctx)
 				if err != nil {
@@ -87,7 +87,7 @@ func testTransaction(t *testing.T) {
 		},
 		{
 			description: "no error(read)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				txn, err := getTransaction(ctx)
 				if err != nil {
@@ -105,7 +105,7 @@ func testTransaction(t *testing.T) {
 		},
 		{
 			description: "no error(write)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				txn, err := getTransaction(ctx)
 				if err != nil {
@@ -151,15 +151,15 @@ func testRTransaction(t *testing.T) {
 
 	testErr := errors.New("test error")
 
-	tests := []struct{
+	tests := []struct {
 		description string
-		ctx context.Context
-		fn func(context.Context) error
-		err error
+		ctx         context.Context
+		fn          func(context.Context) error
+		err         error
 	}{
 		{
 			description: "no error(no proccess)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				return nil
 			},
@@ -167,7 +167,7 @@ func testRTransaction(t *testing.T) {
 		},
 		{
 			description: "error(error in func)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				return testErr
 			},
@@ -175,7 +175,7 @@ func testRTransaction(t *testing.T) {
 		},
 		{
 			description: "no error(get transaction)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				iTxn := ctx.Value(ctxManager.TransactionKey)
 				if iTxn == nil {
@@ -193,7 +193,7 @@ func testRTransaction(t *testing.T) {
 		},
 		{
 			description: "no error(getTransaction)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				_, err := getTransaction(ctx)
 				if err != nil {
@@ -206,7 +206,7 @@ func testRTransaction(t *testing.T) {
 		},
 		{
 			description: "no error(read)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				txn, err := getTransaction(ctx)
 				if err != nil {
@@ -224,7 +224,7 @@ func testRTransaction(t *testing.T) {
 		},
 		{
 			description: "error(write)",
-			ctx: context.Background(),
+			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				txn, err := getTransaction(ctx)
 				if err != nil {

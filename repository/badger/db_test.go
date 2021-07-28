@@ -9,7 +9,7 @@ import (
 var testBadgerBaseDir = os.Getenv("BADGER_DIR")
 
 func newTestDB(testName string) (*DB, func(), error) {
-	badgeDir := path.Join(testBadgerBaseDir, "test_" + testName)
+	badgeDir := path.Join(testBadgerBaseDir, "test_"+testName)
 
 	db, close, err := newDB(badgeDir, testName)
 	if err != nil {

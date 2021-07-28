@@ -50,35 +50,35 @@ func testCreate(t *testing.T) {
 	}
 
 	tests := []struct {
-		description string
-		user *domain.User
-		isErr bool
-		err error
-		noTxn bool
+		description   string
+		user          *domain.User
+		isErr         bool
+		err           error
+		noTxn         bool
 		duplicateUser bool
 	}{
 		{
 			description: "create user with password",
-			user: domain.NewUser(testUserNames[0], testHashedPassword),
-			err: nil,
+			user:        domain.NewUser(testUserNames[0], testHashedPassword),
+			err:         nil,
 		},
 		{
 			description: "create user with empty password",
-			user: domain.NewUser(testUserNames[1], ""),
-			isErr: true,
-			err: repository.ErrUserPasswordEmpty,
+			user:        domain.NewUser(testUserNames[1], ""),
+			isErr:       true,
+			err:         repository.ErrUserPasswordEmpty,
 		},
 		{
 			description: "no transaction",
-			user: domain.NewUser(testUserNames[2], testHashedPassword),
-			isErr: true,
-			noTxn: true,
+			user:        domain.NewUser(testUserNames[2], testHashedPassword),
+			isErr:       true,
+			noTxn:       true,
 		},
 		{
-			description: "user already exists",
-			user: domain.NewUser(testUserNames[3], testHashedPassword),
-			isErr: true,
-			err: repository.ErrUserExist,
+			description:   "user already exists",
+			user:          domain.NewUser(testUserNames[3], testHashedPassword),
+			isErr:         true,
+			err:           repository.ErrUserExist,
 			duplicateUser: true,
 		},
 	}
@@ -189,12 +189,12 @@ func testGetPassword(t *testing.T) {
 
 	tests := []struct {
 		description string
-		txnType transactionType
-		userName values.UserName
-		password values.HashedPassword
-		sameTxn bool
-		isErr bool
-		err error
+		txnType     transactionType
+		userName    values.UserName
+		password    values.HashedPassword
+		sameTxn     bool
+		isErr       bool
+		err         error
 	}{
 		{
 			description: "read transaction",
@@ -321,9 +321,9 @@ func testGetAllUser(t *testing.T) {
 	tests := []struct {
 		description string
 		txnType     transactionType
-		users []values.UserName
-		isErr bool
-		err error
+		users       []values.UserName
+		isErr       bool
+		err         error
 	}{
 		{
 			description: "read transaction",

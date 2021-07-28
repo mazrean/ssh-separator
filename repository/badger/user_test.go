@@ -19,6 +19,7 @@ func TestUser(t *testing.T) {
 
 	t.Run("Create", testCreate)
 	t.Run("GetPassword", testGetPassword)
+	t.Run("GetAllUser", testGetAllUser)
 }
 
 func testCreate(t *testing.T) {
@@ -266,6 +267,104 @@ func testGetPassword(t *testing.T) {
 				assert.NoError(t, err)
 
 				assert.Equal(t, test.password, password)
+			} else {
+				assert.Error(t, err)
+
+				if test.err != nil && !errors.Is(err, test.err) {
+					t.Errorf("expected error %+v, got %+v", test.err, err)
+				}
+			}
+		})
+	}
+}
+
+func testGetAllUser(t *testing.T) {
+	t.Parallel()
+
+	db, close, err := newTestDB("user_get_all_user")
+	if err != nil {
+		t.Errorf("failed to create test db: %w", err)
+	}
+	defer close()
+
+	user := NewUser(db)
+
+	testUserNames := make([]values.UserName, 0, 4)
+	for i := 0; i < 4; i++ {
+		testUserName, err := values.NewUserName(fmt.Sprintf("user_%d", i))
+		if err != nil {
+			t.Errorf("failed to create test user name: %w", err)
+		}
+
+		testUserNames = append(testUserNames, testUserName)
+	}
+
+	testHashedPassword, err := values.NewHashedPassword("$2a$10$hgaZ4iV9VYb9xHOLF/Bu4utNbulE5kVu0akP3u7.5xo/dh5q2o.YC")
+	if err != nil {
+		t.Errorf("failed to create test hashed password: %w", err)
+	}
+
+	err = db.DB.Update(func(txn *badger.Txn) error {
+		for _, userName := range testUserNames {
+			err := txn.Set([]byte(userName), []byte(testHashedPassword))
+			if err != nil {
+				t.Errorf("failed to set user password: %w", err)
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		t.Errorf("failed to set user password: %w", err)
+	}
+
+	tests := []struct {
+		description string
+		txnType     transactionType
+		users []values.UserName
+		isErr bool
+		err error
+	}{
+		{
+			description: "read transaction",
+			txnType:     read,
+			users:       testUserNames,
+		},
+		{
+			description: "write transaction",
+			txnType:     read,
+			users:       testUserNames,
+		},
+		{
+			description: "no transaction",
+			txnType:     none,
+			users:       testUserNames,
+			isErr:       true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := context.Background()
+
+			var txn *badger.Txn
+			switch test.txnType {
+			case read:
+				txn = db.DB.NewTransaction(false)
+				defer txn.Discard()
+			case write:
+				txn = db.DB.NewTransaction(true)
+				defer txn.Discard()
+			}
+
+			ctx = context.WithValue(ctx, ctxManager.TransactionKey, txn)
+
+			users, err := user.GetAllUser(ctx)
+
+			if !test.isErr {
+				assert.NoError(t, err)
+
+				assert.Equal(t, test.users, users)
 			} else {
 				assert.Error(t, err)
 

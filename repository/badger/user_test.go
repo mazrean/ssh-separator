@@ -131,7 +131,10 @@ func testCreate(t *testing.T) {
 
 				assert.Equal(t, test.user.HashedPassword, password)
 
-				txn.Commit()
+				err = txn.Commit()
+				if err != nil {
+					t.Errorf("failed to commit transaction: %w", err)
+				}
 
 				err = db.DB.View(func(txn *badger.Txn) error {
 					item, err := txn.Get([]byte(test.user.GetName()))

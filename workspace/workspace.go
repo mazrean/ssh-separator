@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	// ErrWorkspaceExist workspace already exists.
 	ErrWorkspaceExist = errors.New("workspace exist error")
 )
 

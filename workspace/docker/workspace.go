@@ -28,8 +28,9 @@ var (
 )
 
 var containerCounter = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	Help:      "Number of containers.",
 	Namespace: "webshell",
-	Name:      "container_counter",
+	Name:      "container_num",
 }, []string{"status"})
 
 func containerName(userName values.UserName) string {

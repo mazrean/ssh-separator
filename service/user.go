@@ -38,7 +38,9 @@ func NewUser(ww workspace.IWorkspace, sw store.IWorkspace, ru repository.IUser, 
 }
 
 var (
-	ErrUserExist      = errors.New("user exist")
+	// ErrUserExist user already exists
+	ErrUserExist = errors.New("user exist")
+	// ErrWorkspaceExist workspace already exists
 	ErrWorkspaceExist = errors.New("workspace exist")
 )
 
@@ -106,7 +108,9 @@ func (u *User) ResetContainer(ctx context.Context, userName values.UserName) err
 }
 
 var (
-	ErrInvalidUser       = errors.New("invalid user")
+	// ErrInvalidUser invalid user
+	ErrInvalidUser = errors.New("invalid user")
+	// ErrIncorrectPassword incorrect password
 	ErrIncorrectPassword = errors.New("incorrect password")
 )
 

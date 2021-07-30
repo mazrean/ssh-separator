@@ -9,6 +9,7 @@ import (
 )
 
 var requestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+	Help:      "Echo request counter.",
 	Namespace: "webshell",
 	Name:      "http_requests_total",
 }, []string{"code", "method"})

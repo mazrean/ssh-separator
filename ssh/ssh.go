@@ -13,8 +13,9 @@ import (
 )
 
 var connectionCounter = promauto.NewGauge(prometheus.GaugeOpts{
+	Help:      "Number of connections",
 	Namespace: "webshell",
-	Name:      "ssh_connection_counter",
+	Name:      "ssh_connection_num",
 })
 
 type SSH struct {

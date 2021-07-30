@@ -10,9 +10,12 @@ import (
 )
 
 var (
+	// ErrUserPasswordEmpty user password is empty
 	ErrUserPasswordEmpty = errors.New("password is empty")
-	ErrUserExist         = errors.New("user exist error")
-	ErrUserNotExist      = errors.New("user not exist error")
+	// ErrUserExist user already exists
+	ErrUserExist = errors.New("user exist error")
+	// ErrUserNotExist user not exists
+	ErrUserNotExist = errors.New("user not exist error")
 )
 
 type IUser interface {

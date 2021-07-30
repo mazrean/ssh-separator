@@ -7,8 +7,10 @@ type (
 )
 
 const (
+	// StatusDown the status of a workspace when it is down
 	StatusDown WorkspaceStatus = iota
-	StatusUp   WorkspaceStatus = iota
+	// StatusUp the status of a workspace when it is up
+	StatusUp WorkspaceStatus = iota
 )
 
 func NewWorkspaceID(id string) WorkspaceID {

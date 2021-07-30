@@ -39,7 +39,7 @@ func testTransaction(t *testing.T) {
 		err         error
 	}{
 		{
-			description: "no error(no proccess)",
+			description: "no error(no process)",
 			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				return nil
@@ -158,7 +158,7 @@ func testRTransaction(t *testing.T) {
 		err         error
 	}{
 		{
-			description: "no error(no proccess)",
+			description: "no error(no process)",
 			ctx:         context.Background(),
 			fn: func(ctx context.Context) error {
 				return nil

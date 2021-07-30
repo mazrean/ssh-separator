@@ -10,5 +10,13 @@ linters:
     - ineffassign
     - deadcode
     - typecheck
-    - golint
     - gofmt
+    - asciicheck
+    - bodyclose
+    - gosec
+    - misspell
+    - prealloc
+    - promlinter
+    - revive
+    - thelper
+    - whitespace

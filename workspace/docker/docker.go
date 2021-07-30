@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	isLocalImage string = os.Getenv("LOCAL_IMAGE")
-	imageRef     string = os.Getenv("IMAGE_NAME")
-	imageUser    string = os.Getenv("IMAGE_USER")
-	imageCmd     string = os.Getenv("IMAGE_CMD")
+	isLocalImage = os.Getenv("LOCAL_IMAGE")
+	imageRef     = os.Getenv("IMAGE_NAME")
+	imageUser    = os.Getenv("IMAGE_USER")
+	imageCmd     = os.Getenv("IMAGE_CMD")
 	cli          *client.Client
 )
 

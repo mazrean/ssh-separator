@@ -10,23 +10,23 @@ import (
 )
 
 type Workspace struct {
-	sync.Map
+	syncMap sync.Map
 }
 
 func NewWorkspace() *Workspace {
 	return &Workspace{
-		Map: sync.Map{},
+		syncMap: sync.Map{},
 	}
 }
 
 func (w *Workspace) Set(ctx context.Context, userName values.UserName, workspace *domain.Workspace) error {
-	w.Map.Store(userName, workspace)
+	w.syncMap.Store(userName, workspace)
 
 	return nil
 }
 
 func (w *Workspace) Get(ctx context.Context, userName values.UserName) (*domain.Workspace, error) {
-	iWorkspace, ok := w.Map.Load(userName)
+	iWorkspace, ok := w.syncMap.Load(userName)
 	if !ok {
 		return nil, errors.New("user not found")
 	}

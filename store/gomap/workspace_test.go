@@ -89,7 +89,7 @@ func testGet(t *testing.T) {
 
 	tests := []struct {
 		description string
-		isSet bool
+		isSet       bool
 		userName    values.UserName
 		isErr       bool
 		err         error
@@ -105,7 +105,7 @@ func testGet(t *testing.T) {
 			description: "workspace does not exist",
 			userName:    testNotSetUserName,
 			isErr:       true,
-			err: 			 store.ErrWorkspaceNotFound,
+			err:         store.ErrWorkspaceNotFound,
 		},
 	}
 

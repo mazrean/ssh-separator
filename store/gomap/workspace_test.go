@@ -14,6 +14,7 @@ func TestWorkspace(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Set", testSet)
+	t.Run("Get", testGet)
 }
 
 func testSet(t *testing.T) {
@@ -56,6 +57,56 @@ func testSet(t *testing.T) {
 
 				assert.True(t, ok)
 				assert.Equal(t, test.workspace, iWorkspace.(*domain.Workspace))
+			} else {
+				assert.Error(t, err)
+
+				if test.err != nil && !errors.Is(err, test.err) {
+					t.Errorf("expected error %+v, got %+v", test.err, err)
+				}
+			}
+		})
+	}
+}
+
+func testGet(t *testing.T) {
+	t.Parallel()
+	t.Helper()
+
+	w := NewWorkspace()
+
+	testUserName, err := values.NewUserName("testUser")
+	if err != nil {
+		t.Errorf("Error creating test user name: %s", err)
+	}
+
+	testWorkspace := domain.NewWorkspace("test", "testWorkspace", testUserName)
+
+	tests := []struct {
+		description string
+		userName    values.UserName
+		isErr       bool
+		err         error
+		workspace   *domain.Workspace
+	}{
+		{
+			description: "create workspace",
+			userName:    testUserName,
+			workspace:   testWorkspace,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := context.Background()
+
+			w.syncMap.Store(test.userName, test.workspace)
+
+			workspace, err := w.Get(ctx, test.userName)
+
+			if !test.isErr {
+				assert.NoError(t, err)
+
+				assert.Equal(t, test.workspace, workspace)
 			} else {
 				assert.Error(t, err)
 

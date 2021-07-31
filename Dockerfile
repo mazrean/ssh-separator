@@ -1,4 +1,4 @@
-# syntax = docker/dockerfile:1.0-experimental
+# syntax = docker/dockerfile:1.3.0
 
 FROM golang:1.16-buster AS build
 

@@ -3,9 +3,15 @@ package store
 
 import (
 	"context"
+	"errors"
 
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
+)
+
+var (
+	// ErrWorkspaceNotFound a workspace is not found.
+	ErrWorkspaceNotFound = errors.New("not found")
 )
 
 type IWorkspace interface {

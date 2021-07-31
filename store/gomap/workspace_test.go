@@ -7,6 +7,7 @@ import (
 
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
+	"github.com/mazrean/separated-webshell/store"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -79,19 +80,32 @@ func testGet(t *testing.T) {
 		t.Errorf("Error creating test user name: %s", err)
 	}
 
+	testNotSetUserName, err := values.NewUserName("testNotSetUser")
+	if err != nil {
+		t.Errorf("Error creating test user name: %s", err)
+	}
+
 	testWorkspace := domain.NewWorkspace("test", "testWorkspace", testUserName)
 
 	tests := []struct {
 		description string
+		isSet bool
 		userName    values.UserName
 		isErr       bool
 		err         error
 		workspace   *domain.Workspace
 	}{
 		{
-			description: "create workspace",
+			description: "workspace exists",
+			isSet:       true,
 			userName:    testUserName,
 			workspace:   testWorkspace,
+		},
+		{
+			description: "workspace does not exist",
+			userName:    testNotSetUserName,
+			isErr:       true,
+			err: 			 store.ErrWorkspaceNotFound,
 		},
 	}
 
@@ -99,7 +113,9 @@ func testGet(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := context.Background()
 
-			w.syncMap.Store(test.userName, test.workspace)
+			if test.isSet {
+				w.syncMap.Store(test.userName, test.workspace)
+			}
 
 			workspace, err := w.Get(ctx, test.userName)
 

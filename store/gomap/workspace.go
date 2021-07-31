@@ -7,6 +7,7 @@ import (
 
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
+	"github.com/mazrean/separated-webshell/store"
 )
 
 type Workspace struct {
@@ -28,7 +29,7 @@ func (w *Workspace) Set(ctx context.Context, userName values.UserName, workspace
 func (w *Workspace) Get(ctx context.Context, userName values.UserName) (*domain.Workspace, error) {
 	iWorkspace, ok := w.syncMap.Load(userName)
 	if !ok {
-		return nil, errors.New("user not found")
+		return nil, store.ErrWorkspaceNotFound
 	}
 
 	workspace, ok := iWorkspace.(*domain.Workspace)

@@ -14,7 +14,7 @@ Tool to distribute ssh connections to docker containers for each user
 ## Usage
 ### Launch
 It can be started using docker.
-For more information about environment variables, please see [Environment Variables](./#Environment Variables).
+For more information about environment variables, please see [Environment Variables](#environment-variables).
 
 example
 ```

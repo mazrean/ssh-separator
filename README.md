@@ -6,9 +6,11 @@
 [![go report](https://goreportcard.com/badge/mazrean/ssh-separator)](https://goreportcard.com/report/mazrean/ssh-separator)
 
 Tool to distribute ssh connections to docker containers for each user
+
 ![](docs/image/architecture.drawio.svg)
 
 ## Requirement
+
 * docker
 
 ## Usage

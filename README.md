@@ -31,7 +31,7 @@ See [OpenAPI](https://mazrean.github.io/ssh-separator/openapi/) for details.
 ## Environment Variables
 |variable|description|example value|
 |-|-|-|
-|WELCOME|The string displayed upon successful login.|Login succeeded!|
+|WELCOME|The string displayed upon successful login.|Login success!|
 |API_KEY|API key for REST API.|aeneexiene7uu3fie4pa|
 |API_PORT|Port for REST API|3000|
 |SSH_PORT|Port for ssh|2222|

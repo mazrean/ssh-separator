@@ -1,0 +1,117 @@
+openapi: "3.0.3"
+servers:
+  - url: 'http://localhost:8080/api'
+    description: local
+info:
+  title: ssh-separator API
+  version: "0.1.0"
+  description: ssh-separator API
+paths:
+  /new:
+    post:
+      operationId: postNewUser
+      description: create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        201:
+          description: succeeded
+        400:
+          description: invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: invalid api key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /reset:
+    put:
+      operationId: putReset
+      description: reset user container
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reset'
+      responses:
+        201:
+          description: succeeded
+        400:
+          description: invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: invalid api key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    NewUser:
+      type: object
+      properties:
+        key:
+          type: string
+          example: "aeneexiene7uu3fie4pa"
+          description: API Key
+        name:
+          type: string
+          example: mazrean
+          description: user name
+          pattern: "^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{0,14}[a-zA-Z0-9])?$"
+        cred:
+          type: string
+          example: "jaemuut9ohkeeb5koono"
+          description: user password
+          pattern: "^[a-zA-Z0-9]{8,32}$"
+      required:
+        - api_key
+        - name
+        - cred
+    Reset:
+      type: object
+      properties:
+        key:
+          type: string
+          example: "aeneexiene7uu3fie4pa"
+          description: API Key
+        name:
+          type: string
+          example: mazrean
+          description: Username
+          pattern: "^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{0,14}[a-zA-Z0-9])?$"
+      required:
+        - api_key
+        - name
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+      required:
+        - message

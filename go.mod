@@ -18,8 +18,7 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/klauspost/compress v1.13.1 // indirect
-	github.com/labstack/echo/v4 v4.4.0
-	github.com/mattn/go-isatty v0.0.13 // indirect
+	github.com/labstack/echo/v4 v4.6.1
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.11.0
@@ -27,8 +26,7 @@ require (
 	github.com/prometheus/procfs v0.7.1 // indirect
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
-	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b // indirect
 )

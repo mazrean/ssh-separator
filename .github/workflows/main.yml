@@ -14,7 +14,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set cache
@@ -34,7 +34,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
       - name: Checkout
         uses: actions/checkout@v2
       - name: Download go mod cache
@@ -65,7 +65,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
       - name: Install reviewdog
         run: curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
       - name: Install golangci-lint
@@ -92,7 +92,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
       - uses: actions/checkout@v2
       - uses: actions/cache@v1
         with:

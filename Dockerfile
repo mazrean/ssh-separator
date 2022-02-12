@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.3.0
 
-FROM golang:1.17.6-buster AS build
+FROM golang:1.17.7-buster AS build
 
 WORKDIR /app
 

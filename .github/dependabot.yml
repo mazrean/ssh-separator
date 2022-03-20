@@ -8,20 +8,20 @@ updates:
 - package-ecosystem: gomod
   directory: "/"
   schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+    interval: weekly
+    day: friday
 - package-ecosystem: docker
   directory: "/docker"
   schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+    interval: weekly
+    day: friday
 - package-ecosystem: docker
   directory: "/"
   schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+    interval: weekly
+    day: friday
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+    interval: weekly
+    day: friday

@@ -24,7 +24,7 @@ func testTransaction(t *testing.T) {
 
 	db, close, err := newTestDB("transaction_transaction")
 	if err != nil {
-		t.Errorf("failed to create test db: %w", err)
+		t.Errorf("failed to create test db: %v", err)
 	}
 	defer close()
 
@@ -143,7 +143,7 @@ func testRTransaction(t *testing.T) {
 
 	db, close, err := newTestDB("transaction_rtransaction")
 	if err != nil {
-		t.Errorf("failed to create test db: %w", err)
+		t.Errorf("failed to create test db: %v", err)
 	}
 	defer close()
 

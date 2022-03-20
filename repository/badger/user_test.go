@@ -28,7 +28,7 @@ func testCreate(t *testing.T) {
 
 	db, close, err := newTestDB("user_create")
 	if err != nil {
-		t.Errorf("failed to create test db: %w", err)
+		t.Errorf("failed to create test db: %v", err)
 	}
 	defer close()
 
@@ -38,7 +38,7 @@ func testCreate(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		testUserName, err := values.NewUserName(fmt.Sprintf("user_%d", i))
 		if err != nil {
-			t.Errorf("failed to create test user name: %w", err)
+			t.Errorf("failed to create test user name: %v", err)
 		}
 
 		testUserNames = append(testUserNames, testUserName)
@@ -46,7 +46,7 @@ func testCreate(t *testing.T) {
 
 	testHashedPassword, err := values.NewHashedPassword("$2a$10$hgaZ4iV9VYb9xHOLF/Bu4utNbulE5kVu0akP3u7.5xo/dh5q2o.YC")
 	if err != nil {
-		t.Errorf("failed to create test hashed password: %w", err)
+		t.Errorf("failed to create test hashed password: %v", err)
 	}
 
 	tests := []struct {
@@ -97,7 +97,7 @@ func testCreate(t *testing.T) {
 				if test.duplicateUser {
 					err = txn.Set([]byte(test.user.GetName()), []byte(test.user.HashedPassword))
 					if err != nil {
-						t.Errorf("failed to create user: %w", err)
+						t.Errorf("failed to create user: %v", err)
 					}
 				}
 			}
@@ -133,7 +133,7 @@ func testCreate(t *testing.T) {
 
 				err = txn.Commit()
 				if err != nil {
-					t.Errorf("failed to commit transaction: %w", err)
+					t.Errorf("failed to commit transaction: %v", err)
 				}
 
 				err = db.DB.View(func(txn *badger.Txn) error {
@@ -169,7 +169,7 @@ func testGetPassword(t *testing.T) {
 
 	db, close, err := newTestDB("user_get_password")
 	if err != nil {
-		t.Errorf("failed to create test db: %w", err)
+		t.Errorf("failed to create test db: %v", err)
 	}
 	defer close()
 
@@ -179,7 +179,7 @@ func testGetPassword(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		testUserName, err := values.NewUserName(fmt.Sprintf("user_%d", i))
 		if err != nil {
-			t.Errorf("failed to create test user name: %w", err)
+			t.Errorf("failed to create test user name: %v", err)
 		}
 
 		testUserNames = append(testUserNames, testUserName)
@@ -187,7 +187,7 @@ func testGetPassword(t *testing.T) {
 
 	testHashedPassword, err := values.NewHashedPassword("$2a$10$hgaZ4iV9VYb9xHOLF/Bu4utNbulE5kVu0akP3u7.5xo/dh5q2o.YC")
 	if err != nil {
-		t.Errorf("failed to create test hashed password: %w", err)
+		t.Errorf("failed to create test hashed password: %v", err)
 	}
 
 	tests := []struct {
@@ -241,7 +241,7 @@ func testGetPassword(t *testing.T) {
 					return nil
 				})
 				if err != nil {
-					t.Errorf("failed to set user password: %w", err)
+					t.Errorf("failed to set user password: %v", err)
 				}
 			}
 
@@ -260,7 +260,7 @@ func testGetPassword(t *testing.T) {
 			if test.sameTxn {
 				err := txn.Set([]byte(test.userName), []byte(test.password))
 				if err != nil {
-					t.Errorf("failed to set user password: %w", err)
+					t.Errorf("failed to set user password: %v", err)
 				}
 			}
 
@@ -286,7 +286,7 @@ func testGetAllUser(t *testing.T) {
 
 	db, close, err := newTestDB("user_get_all_user")
 	if err != nil {
-		t.Errorf("failed to create test db: %w", err)
+		t.Errorf("failed to create test db: %v", err)
 	}
 	defer close()
 
@@ -296,7 +296,7 @@ func testGetAllUser(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		testUserName, err := values.NewUserName(fmt.Sprintf("user_%d", i))
 		if err != nil {
-			t.Errorf("failed to create test user name: %w", err)
+			t.Errorf("failed to create test user name: %v", err)
 		}
 
 		testUserNames = append(testUserNames, testUserName)
@@ -304,21 +304,21 @@ func testGetAllUser(t *testing.T) {
 
 	testHashedPassword, err := values.NewHashedPassword("$2a$10$hgaZ4iV9VYb9xHOLF/Bu4utNbulE5kVu0akP3u7.5xo/dh5q2o.YC")
 	if err != nil {
-		t.Errorf("failed to create test hashed password: %w", err)
+		t.Errorf("failed to create test hashed password: %v", err)
 	}
 
 	err = db.DB.Update(func(txn *badger.Txn) error {
 		for _, userName := range testUserNames {
 			err := txn.Set([]byte(userName), []byte(testHashedPassword))
 			if err != nil {
-				t.Errorf("failed to set user password: %w", err)
+				t.Errorf("failed to set user password: %v", err)
 			}
 		}
 
 		return nil
 	})
 	if err != nil {
-		t.Errorf("failed to set user password: %w", err)
+		t.Errorf("failed to set user password: %v", err)
 	}
 
 	tests := []struct {

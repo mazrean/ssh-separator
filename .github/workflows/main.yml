@@ -6,6 +6,9 @@ on:
       - 'main'
   pull_request:
 
+env:
+  GO_VERSION: '1.17'
+
 jobs:
   mod:
     name: Mod
@@ -14,7 +17,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: ${{ env.GO_VERSION }}
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set cache
@@ -34,7 +37,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: ${{ env.GO_VERSION }}
       - name: Checkout
         uses: actions/checkout@v3
       - name: Download go mod cache
@@ -65,7 +68,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: ${{ env.GO_VERSION }}
       - name: Install reviewdog
         run: curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
       - name: Install golangci-lint
@@ -92,7 +95,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: ${{ env.GO_VERSION }}
       - uses: actions/checkout@v3
       - uses: actions/cache@v1
         with:

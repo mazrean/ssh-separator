@@ -10,6 +10,7 @@ on:
 env:
   APP_IMAGE_NAME: ssh-separator
   USER_IMAGE_NAME: ssh-separator-ubuntu
+  GO_VERSION: '1.17'
 
 jobs:
   app_image:
@@ -57,7 +58,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: ${{ env.GO_VERSION }}
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:

@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
       GOCACHE: "/tmp/go/cache"
     steps:
       - name: Setup go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
       - name: Checkout
@@ -66,7 +66,7 @@ jobs:
     needs: [mod]
     steps:
       - name: Setup go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
       - name: Install reviewdog
@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [mod]
     steps:
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
       - uses: actions/checkout@v3

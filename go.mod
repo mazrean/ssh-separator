@@ -11,7 +11,7 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/prometheus/client_golang v1.12.2
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.7.5
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
 )
 

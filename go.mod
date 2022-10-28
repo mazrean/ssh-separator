@@ -3,7 +3,7 @@ module github.com/mazrean/separated-webshell
 go 1.17
 
 require (
-	github.com/dgraph-io/badger/v3 v3.2103.2
+	github.com/dgraph-io/badger/v3 v3.2103.3
 	github.com/docker/docker v20.10.21+incompatible
 	github.com/gliderlabs/ssh v0.3.5
 	github.com/go-playground/validator/v10 v10.11.1
@@ -22,7 +22,7 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgraph-io/ristretto v0.1.0 // indirect
+	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
-	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
+	golang.org/x/sys v0.0.0-20221010170243-090e33056c14 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

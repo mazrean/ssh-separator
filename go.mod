@@ -3,7 +3,7 @@ module github.com/mazrean/separated-webshell
 go 1.17
 
 require (
-	github.com/dgraph-io/badger/v3 v3.2103.3
+	github.com/dgraph-io/badger/v3 v3.2103.4
 	github.com/docker/docker v20.10.21+incompatible
 	github.com/gliderlabs/ssh v0.3.5
 	github.com/go-playground/validator/v10 v10.11.1

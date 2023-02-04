@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.3.0
 
-FROM ubuntu:22.04
+FROM ubuntu:23.04
 
 RUN useradd -m --uid 1000 --groups sudo ubuntu && \
   echo 'ubuntu:ubuntu' | chpasswd

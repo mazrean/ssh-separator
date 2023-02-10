@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/dgraph-io/badger/v3 v3.2103.5
-	github.com/docker/docker v20.10.21+incompatible
+	github.com/docker/docker v23.0.1+incompatible
 	github.com/gliderlabs/ssh v0.3.5
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang/mock v1.6.0
@@ -51,7 +51,6 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.opencensus.io v0.23.0 // indirect

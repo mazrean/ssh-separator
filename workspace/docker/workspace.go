@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -22,7 +21,7 @@ const (
 )
 
 var (
-	stopTimeout = 10 * time.Second
+	stopTimeout = 10
 	cpuLimit    int64
 	memoryLimit int64
 )
@@ -103,7 +102,9 @@ func (w *Workspace) Start(ctx context.Context, workspace *domain.Workspace) erro
 }
 
 func (w *Workspace) Stop(ctx context.Context, workspace *domain.Workspace) error {
-	err := cli.ContainerStop(ctx, string(workspace.ID()), &stopTimeout)
+	err := cli.ContainerStop(ctx, string(workspace.ID()), container.StopOptions{
+		Timeout: &stopTimeout,
+	})
 	if err != nil {
 		return fmt.Errorf("failed to stop container: %w", err)
 	}

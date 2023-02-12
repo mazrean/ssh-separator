@@ -103,7 +103,7 @@ func (w *Workspace) Start(ctx context.Context, workspace *domain.Workspace) erro
 }
 
 func (w *Workspace) Stop(ctx context.Context, workspace *domain.Workspace) error {
-	err := cli.ContainerStop(ctx, string(workspace.ID()), types.ContainerStopOptions{
+	err := cli.ContainerStop(ctx, string(workspace.ID()), container.StopOptions{
 		Timeout: &stopTimeout,
 	})
 	if err != nil {

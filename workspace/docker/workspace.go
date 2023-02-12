@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	stopTimeout = 10 * time.Second
+	stopTimeout = 10
 	cpuLimit    int64
 	memoryLimit int64
 )

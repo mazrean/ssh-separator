@@ -14,10 +14,9 @@ jobs:
       GOCACHE: "/tmp/go/cache"
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
-          cache: true
       - name: Set go build cache
         uses: actions/cache@v3
         with:
@@ -49,10 +48,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
-          cache: true
       - run: go test ./... -v -coverprofile=coverage.txt -race -vet=off
       - name: Upload coverage data
         uses: codecov/codecov-action@v3

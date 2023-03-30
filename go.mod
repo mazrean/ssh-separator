@@ -1,6 +1,6 @@
 module github.com/mazrean/separated-webshell
 
-go 1.17
+go 1.
 
 require (
 	github.com/dgraph-io/badger/v3 v3.2103.5

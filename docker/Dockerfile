@@ -2,4 +2,5 @@
 
 FROM ubuntu:23.04
 
+RUN apt update && apt install sudo
 RUN echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers

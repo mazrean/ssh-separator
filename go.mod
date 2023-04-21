@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/dgraph-io/badger/v3 v3.2103.5
-	github.com/docker/docker v23.0.3+incompatible
+	github.com/docker/docker v23.0.4+incompatible
 	github.com/gliderlabs/ssh v0.3.5
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/golang/mock v1.6.0

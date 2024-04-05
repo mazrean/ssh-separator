@@ -8,7 +8,7 @@ require (
 	github.com/gliderlabs/ssh v0.3.7
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/golang/mock v1.6.0
-	github.com/google/wire v0.5.0
+	github.com/google/wire v0.6.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/prometheus/client_golang v1.19.0
 	github.com/stretchr/testify v1.9.0

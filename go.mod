@@ -6,7 +6,7 @@ require (
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/docker/docker v25.0.5+incompatible
 	github.com/gliderlabs/ssh v0.3.7
-	github.com/go-playground/validator/v10 v10.19.0
+	github.com/go-playground/validator/v10 v10.20.0
 	github.com/golang/mock v1.6.0
 	github.com/google/wire v0.6.0
 	github.com/labstack/echo/v4 v4.12.0

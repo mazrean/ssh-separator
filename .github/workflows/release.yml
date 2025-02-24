@@ -5,7 +5,7 @@ on:
     tags:
       - v*.*.*
     branches-ignore:
-      - '**'
+      - "**"
 
 env:
   APP_IMAGE_NAME: ssh-separator
@@ -58,7 +58,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   user_image:

@@ -1,18 +1,20 @@
-# syntax = docker/dockerfile:1.3.0
+# syntax = docker/dockerfile:1
 
-FROM golang:1.20.5-buster AS build
+FROM golang:1.24.0-bookworm AS build
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN --mount=type=cache,target=/go/pkg/mod/cache \
-  go mod download
+RUN --mount=type=bind,source=go.mod,target=/app/go.mod,readonly \\
+  --mount=type=bind,source=go.sum,target=/app/go.sum,readonly \\
+  --mount=type=cache,target=/go/pkg/mod/cache \\
+  go mod download -x
 
-COPY . .
-RUN --mount=type=cache,target=/root/.cache/go-build \
-  go build -o ssh-server .
+RUN --mount=type=bind,source=.,target=/app,readonly \\
+  --mount=type=cache,target=/root/.cache/go-build \\
+  --mount=type=cache,target=/go/pkg/mod/cache \\
+  GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -o ssh-server .
 
-FROM gcr.io/distroless/base-debian10
+FROM gcr.io/distroless/base-debian12
 
 WORKDIR /app
 COPY --from=build /app/ssh-server ./

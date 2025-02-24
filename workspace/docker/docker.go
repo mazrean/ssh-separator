@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 )
 
@@ -20,7 +20,7 @@ var (
 
 func Setup() error {
 	var err error
-	cli, err = client.NewClientWithOpts()
+	cli, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %w", err)
 	}
@@ -28,7 +28,7 @@ func Setup() error {
 	ctx := context.Background()
 
 	if len(isLocalImage) == 0 || isLocalImage == "false" {
-		reader, err := cli.ImagePull(ctx, imageRef, types.ImagePullOptions{})
+		reader, err := cli.ImagePull(ctx, imageRef, image.PullOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to pull image: %w", err)
 		}

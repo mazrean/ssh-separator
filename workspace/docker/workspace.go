@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/errdefs"
 	"github.com/mazrean/separated-webshell/domain"
@@ -90,7 +89,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 }
 
 func (w *Workspace) Start(ctx context.Context, workspace *domain.Workspace) error {
-	err := cli.ContainerStart(ctx, string(workspace.ID()), types.ContainerStartOptions{})
+	err := cli.ContainerStart(ctx, string(workspace.ID()), container.StartOptions{})
 	if err != nil && !errdefs.IsConflict(err) {
 		return fmt.Errorf("failed to start container: %w", err)
 	}
@@ -116,7 +115,7 @@ func (w *Workspace) Stop(ctx context.Context, workspace *domain.Workspace) error
 }
 
 func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (*domain.Workspace, error) {
-	err := cli.ContainerRemove(ctx, string(workspace.ID()), types.ContainerRemoveOptions{
+	err := cli.ContainerRemove(ctx, string(workspace.ID()), container.RemoveOptions{
 		Force: true,
 	})
 	if err != nil {

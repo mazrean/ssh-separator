@@ -1,10 +1,7 @@
-version: "3"
-
 services:
   ssh-server:
     build:
       context: ..
-      dockerfile: dev/Dockerfile
     environment:
       WELCOME: "Login success!"
       PROMETHEUS: "true"
@@ -24,8 +21,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../badger:/tmp/badger
-      - ../:/app/
     security_opt:
       - apparmor:unconfined
     cap_add:
       - SYS_PTRACE
+    develop:
+      watch:
+        - action: rebuild
+          path: ..

@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+          cache: false
+      - uses: gocica-go/gocica-action@v0.1.0-alpha1
       - run: go mod download
       - run: go build -o ssh-server .
       - uses: actions/upload-artifact@v4

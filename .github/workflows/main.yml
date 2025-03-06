@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - 'main'
+      - "main"
   pull_request:
 
 jobs:
@@ -17,14 +17,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - name: Set go build cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/go/cache
-          key: ${{ runner.os }}-go-build-${{ github.ref }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-go-build-${{ github.ref }}-
-            ${{ runner.os }}-go-build-
       - run: go build -o ssh-server .
       - uses: actions/upload-artifact@v4
         with:
@@ -42,7 +34,8 @@ jobs:
           go_version_file: go.mod
           reporter: github-pr-check
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          fail_on_error: true
+          level: error
+          fail_level: error
   test:
     name: Test
     runs-on: ubuntu-latest

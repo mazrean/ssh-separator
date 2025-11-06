@@ -1,16 +1,6 @@
+version: "2"
 linters:
   enable:
-    - govet
-    - errcheck
-    - staticcheck
-    - unused
-    - gosimple
-    - structcheck
-    - varcheck
-    - ineffassign
-    - deadcode
-    - typecheck
-    - gofmt
     - asciicheck
     - bodyclose
     - gosec
@@ -20,3 +10,23 @@ linters:
     - revive
     - thelper
     - whitespace
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

@@ -1,0 +1,22 @@
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - structcheck
+    - varcheck
+    - ineffassign
+    - deadcode
+    - typecheck
+    - gofmt
+    - asciicheck
+    - bodyclose
+    - gosec
+    - misspell
+    - prealloc
+    - promlinter
+    - revive
+    - thelper
+    - whitespace

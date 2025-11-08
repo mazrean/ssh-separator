@@ -20,10 +20,10 @@ const (
 )
 
 var (
-	stopTimeout            = 10
-	cpuLimit               int64
-	memoryLimit            int64
-	maxConnectionsPerUser  int32
+	stopTimeout           = 10
+	cpuLimit              int64
+	memoryLimit           int64
+	maxConnectionsPerUser int32
 )
 
 var containerCounter = promauto.NewGaugeVec(prometheus.GaugeOpts{

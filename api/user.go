@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/subtle"
 	"errors"
 	"fmt"
 	"net/http"
@@ -46,7 +47,7 @@ func (u *User) PostNewUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	if req.APIKey != apiKey {
+	if subtle.ConstantTimeCompare([]byte(req.APIKey), []byte(apiKey)) != 1 {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid api key")
 	}
 
@@ -88,7 +89,7 @@ func (u *User) PutReset(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	if req.APIKey != apiKey {
+	if subtle.ConstantTimeCompare([]byte(req.APIKey), []byte(apiKey)) != 1 {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid api key")
 	}
 

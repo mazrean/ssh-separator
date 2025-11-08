@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mazrean/separated-webshell/api/middlewares"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"golang.org/x/time/rate"
 )
 
 var (
@@ -77,8 +80,41 @@ func (api *API) Start(port int) error {
 		e.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 	}
 
-	e.POST("/new", api.User.PostNewUser)
-	e.PUT("/reset", api.User.PutReset)
+	// API認証エンドポイント用のレート制限設定
+	// 環境変数から設定を読み取る（デフォルト: 1分間に5回まで）
+	rateLimitRate := 5
+	if envRate, ok := os.LookupEnv("RATE_LIMIT_RATE"); ok {
+		if parsedRate, err := strconv.Atoi(envRate); err == nil && parsedRate > 0 {
+			rateLimitRate = parsedRate
+		}
+	}
+
+	rateLimitBurst := 5
+	if envBurst, ok := os.LookupEnv("RATE_LIMIT_BURST"); ok {
+		if parsedBurst, err := strconv.Atoi(envBurst); err == nil && parsedBurst > 0 {
+			rateLimitBurst = parsedBurst
+		}
+	}
+
+	rateLimitExpiresIn := int(time.Minute / time.Second)
+	if envExpires, ok := os.LookupEnv("RATE_LIMIT_EXPIRES_IN"); ok {
+		if parsedExpires, err := strconv.Atoi(envExpires); err == nil && parsedExpires > 0 {
+			rateLimitExpiresIn = parsedExpires
+		}
+	}
+
+	rateLimiterConfig := middleware.RateLimiterConfig{
+		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
+			middleware.RateLimiterMemoryStoreConfig{
+				Rate:      rate.Limit(rateLimitRate),
+				Burst:     rateLimitBurst,
+				ExpiresIn: time.Duration(rateLimitExpiresIn) * time.Second,
+			},
+		),
+	}
+
+	e.POST("/new", api.PostNewUser, middleware.RateLimiterWithConfig(rateLimiterConfig))
+	e.PUT("/reset", api.PutReset, middleware.RateLimiterWithConfig(rateLimiterConfig))
 
 	return e.Start(fmt.Sprintf(":%d", port))
 }

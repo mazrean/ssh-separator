@@ -43,6 +43,9 @@ See [OpenAPI](https://mazrean.github.io/ssh-separator/openapi/) for details.
 |MEMORY_LIMIT|Memory limits for user containers.|1024|
 |BADGER_DIR|Directory where user data is stored.|/var/lib/ssh-separator|
 |PROMETHEUS|If true, provide metrics for prometheus.|true|
+|RATE_LIMIT_RATE|Number of allowed requests per second for API authentication endpoints.|5|
+|RATE_LIMIT_BURST|Maximum burst size for rate limiting on API authentication endpoints.|5|
+|RATE_LIMIT_EXPIRES_IN|Expiration time in seconds for rate limiter entries.|60|
 
 ## Author
 Shunsuke Wakamatsu (a.k.a mazrean)

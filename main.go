@@ -11,10 +11,10 @@ import (
 func main() {
 	strAPIPort := os.Getenv("API_PORT")
 	strSSHPort := os.Getenv("SSH_PORT")
-	apiKey := os.Getenv("API_KEY")
+	apiKey, ok := os.LookupEnv("API_KEY")
 
 	// API_KEY環境変数の検証
-	if apiKey == "" {
+	if !ok || apiKey == "" {
 		panic(fmt.Errorf("API_KEY environment variable is not set or empty. This is required for API authentication"))
 	}
 

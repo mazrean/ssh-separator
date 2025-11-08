@@ -23,7 +23,7 @@ var (
 	stopTimeout           = 10
 	cpuLimit              int64
 	memoryLimit           int64
-	maxConnectionsPerUser int32
+	maxConnectionsPerUser = int64(5)
 )
 
 var containerCounter = promauto.NewGaugeVec(prometheus.GaugeOpts{
@@ -53,14 +53,12 @@ func NewWorkspace() (*Workspace, error) {
 
 	// Read max connections per user from environment variable
 	maxConnectionsPerUserStr, ok := os.LookupEnv("MAX_CONNECTIONS_PER_USER")
-	if !ok || maxConnectionsPerUserStr == "" {
-		maxConnectionsPerUser = 10 // Default value
-	} else {
-		maxConnectionsPerUserInt, err := strconv.ParseInt(maxConnectionsPerUserStr, 10, 32)
+	if ok && maxConnectionsPerUserStr != "" {
+		maxConnectionsPerUserInt, err := strconv.ParseInt(maxConnectionsPerUserStr, 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("invalid max connections per user: %w", err)
 		}
-		maxConnectionsPerUser = int32(maxConnectionsPerUserInt)
+		maxConnectionsPerUser = maxConnectionsPerUserInt
 	}
 
 	return &Workspace{}, nil

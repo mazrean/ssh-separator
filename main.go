@@ -31,15 +31,13 @@ func main() {
 
 	// Read max total connections from environment variable
 	maxTotalConnectionsStr, ok := os.LookupEnv("MAX_TOTAL_CONNECTIONS")
-	var maxTotalConnections int32
-	if !ok || maxTotalConnectionsStr == "" {
-		maxTotalConnections = 100 // Default value
-	} else {
-		maxTotalConnectionsInt, err := strconv.ParseInt(maxTotalConnectionsStr, 10, 32)
+	maxTotalConnections := int64(1000) // Default value
+	if ok && maxTotalConnectionsStr != "" {
+		maxTotalConnectionsInt, err := strconv.ParseInt(maxTotalConnectionsStr, 10, 64)
 		if err != nil {
 			panic(fmt.Errorf("invalid max total connections: %w", err))
 		}
-		maxTotalConnections = int32(maxTotalConnectionsInt)
+		maxTotalConnections = maxTotalConnectionsInt
 	}
 
 	// Create global connection limiter

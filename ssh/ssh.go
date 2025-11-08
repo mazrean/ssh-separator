@@ -88,8 +88,8 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 }
 
 func (ssh *SSH) Start(port int) error {
-	ssh.Server.Addr = fmt.Sprintf(":%d", port)
-	err := ssh.Server.ListenAndServe()
+	ssh.Addr = fmt.Sprintf(":%d", port)
+	err := ssh.ListenAndServe()
 	if err != nil {
 		return fmt.Errorf("listen and serve error: %w", err)
 	}

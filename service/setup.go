@@ -30,9 +30,9 @@ func (s *Setup) Setup() error {
 	ctx := context.Background()
 
 	var users []values.UserName
-	err := s.ITransaction.RTransaction(ctx, func(ctx context.Context) error {
+	err := s.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
-		users, err = s.IUser.GetAllUser(ctx)
+		users, err = s.GetAllUser(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to get all user: %w", err)
 		}

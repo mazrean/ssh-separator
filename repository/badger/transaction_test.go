@@ -22,11 +22,11 @@ func testTransaction(t *testing.T) {
 	t.Parallel()
 	t.Helper()
 
-	db, close, err := newTestDB("transaction_transaction")
+	db, closeFn, err := newTestDB("transaction_transaction")
 	if err != nil {
 		t.Errorf("failed to create test db: %v", err)
 	}
-	defer close()
+	defer closeFn()
 
 	transaction := NewTransaction(db)
 
@@ -41,7 +41,7 @@ func testTransaction(t *testing.T) {
 		{
 			description: "no error(no process)",
 			ctx:         context.Background(),
-			fn: func(ctx context.Context) error {
+			fn: func(context.Context) error {
 				return nil
 			},
 			err: nil,
@@ -49,7 +49,7 @@ func testTransaction(t *testing.T) {
 		{
 			description: "error(error in func)",
 			ctx:         context.Background(),
-			fn: func(ctx context.Context) error {
+			fn: func(context.Context) error {
 				return testErr
 			},
 			err: testErr,
@@ -141,11 +141,11 @@ func testRTransaction(t *testing.T) {
 	t.Parallel()
 	t.Helper()
 
-	db, close, err := newTestDB("transaction_rtransaction")
+	db, closeFn, err := newTestDB("transaction_rtransaction")
 	if err != nil {
 		t.Errorf("failed to create test db: %v", err)
 	}
-	defer close()
+	defer closeFn()
 
 	transaction := NewTransaction(db)
 
@@ -160,7 +160,7 @@ func testRTransaction(t *testing.T) {
 		{
 			description: "no error(no process)",
 			ctx:         context.Background(),
-			fn: func(ctx context.Context) error {
+			fn: func(context.Context) error {
 				return nil
 			},
 			err: nil,
@@ -168,7 +168,7 @@ func testRTransaction(t *testing.T) {
 		{
 			description: "error(error in func)",
 			ctx:         context.Background(),
-			fn: func(ctx context.Context) error {
+			fn: func(context.Context) error {
 				return testErr
 			},
 			err: testErr,

@@ -43,11 +43,11 @@ func main() {
 	// Create global connection limiter
 	connectionLimiter := domain.NewConnectionLimiter(maxTotalConnections)
 
-	server, close, err := InjectServer(apiKey, connectionLimiter)
+	server, closeFn, err := InjectServer(apiKey, connectionLimiter)
 	if err != nil {
 		panic(err)
 	}
-	defer close()
+	defer closeFn()
 
 	err = docker.Setup()
 	if err != nil {

@@ -20,13 +20,13 @@ func NewWorkspace() *Workspace {
 	}
 }
 
-func (w *Workspace) Set(ctx context.Context, userName values.UserName, workspace *domain.Workspace) error {
+func (w *Workspace) Set(_ context.Context, userName values.UserName, workspace *domain.Workspace) error {
 	w.syncMap.Store(userName, workspace)
 
 	return nil
 }
 
-func (w *Workspace) Get(ctx context.Context, userName values.UserName) (*domain.Workspace, error) {
+func (w *Workspace) Get(_ context.Context, userName values.UserName) (*domain.Workspace, error) {
 	iWorkspace, ok := w.syncMap.Load(userName)
 	if !ok {
 		return nil, store.ErrWorkspaceNotFound

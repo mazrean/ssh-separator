@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -13,19 +12,17 @@ import (
 	"github.com/mazrean/separated-webshell/service"
 )
 
-var (
-	apiKey = os.Getenv("API_KEY")
-)
-
 type User struct {
 	*service.User
 	*validator.Validate
+	apiKey string
 }
 
-func NewUser(u *service.User) *User {
+func NewUser(u *service.User, apiKey string) *User {
 	return &User{
 		User:     u,
 		Validate: NewValidator(),
+		apiKey:   apiKey,
 	}
 }
 
@@ -47,7 +44,7 @@ func (u *User) PostNewUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	if subtle.ConstantTimeCompare([]byte(req.APIKey), []byte(apiKey)) != 1 {
+	if subtle.ConstantTimeCompare([]byte(req.APIKey), []byte(u.apiKey)) != 1 {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid api key")
 	}
 
@@ -89,7 +86,12 @@ func (u *User) PutReset(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	if subtle.ConstantTimeCompare([]byte(req.APIKey), []byte(apiKey)) != 1 {
+	// セキュアなデフォルト: APIキーが空の場合は全てのリクエストを拒否
+	if u.apiKey == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "API authentication is not properly configured")
+	}
+
+	if subtle.ConstantTimeCompare([]byte(req.APIKey), []byte(u.apiKey)) != 1 {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid api key")
 	}
 

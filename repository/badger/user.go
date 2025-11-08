@@ -60,6 +60,9 @@ func (*User) GetPassword(ctx context.Context, userName values.UserName) (values.
 
 	item, err := txn.Get([]byte(userName))
 	if err != nil {
+		if errors.Is(err, badger.ErrKeyNotFound) {
+			return "", repository.ErrUserNotExist
+		}
 		return "", fmt.Errorf("failed to get password: %w", err)
 	}
 

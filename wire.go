@@ -39,7 +39,7 @@ func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 	}, nil
 }
 
-func InjectServer() (*Server, func(), error) {
+func InjectServer(apiKey string) (*Server, func(), error) {
 	wire.Build(
 		NewServer,
 		api.NewAPI,

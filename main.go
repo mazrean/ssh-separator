@@ -11,6 +11,12 @@ import (
 func main() {
 	strAPIPort := os.Getenv("API_PORT")
 	strSSHPort := os.Getenv("SSH_PORT")
+	apiKey, ok := os.LookupEnv("API_KEY")
+
+	// API_KEY環境変数の検証
+	if !ok || apiKey == "" {
+		panic(fmt.Errorf("API_KEY environment variable is not set or empty. This is required for API authentication"))
+	}
 
 	apiPort, err := strconv.Atoi(strAPIPort)
 	if err != nil {
@@ -22,7 +28,7 @@ func main() {
 		panic(err)
 	}
 
-	server, close, err := InjectServer()
+	server, close, err := InjectServer(apiKey)
 	if err != nil {
 		panic(err)
 	}

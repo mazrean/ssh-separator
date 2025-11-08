@@ -4,7 +4,6 @@
 [![](https://github.com/mazrean/ssh-separator/workflows/CI/badge.svg)](https://github.com/mazrean/ssh-separator/actions)
 [![](https://github.com/mazrean/ssh-separator/workflows/Release/badge.svg)](https://github.com/mazrean/ssh-separator/actions)
 [![go report](https://goreportcard.com/badge/mazrean/ssh-separator)](https://goreportcard.com/report/mazrean/ssh-separator)
-<a href="https://flatt.tech/oss/gmo/trampoline" target="_blank"><img src="https://flatt.tech/assets/images/badges/gmo-oss.svg" height="24px"/></a>
 
 Tool to distribute ssh connections to docker containers for each user
 
@@ -46,6 +45,12 @@ See [OpenAPI](https://mazrean.github.io/ssh-separator/openapi/) for details.
 |RATE_LIMIT_RATE|Number of allowed requests per second for API authentication endpoints.|5|
 |RATE_LIMIT_BURST|Maximum burst size for rate limiting on API authentication endpoints.|5|
 |RATE_LIMIT_EXPIRES_IN|Expiration time in seconds for rate limiter entries.|60|
+
+## Supports
+
+This project receives support from GMO FlattSecurity's “GMO Open Source Developer Support Program” and regularly conducts security assessments using “Takumi byGMO.”
+
+<a href="https://flatt.tech/oss/gmo/trampoline" target="_blank"><img src="https://flatt.tech/assets/images/badges/gmo-oss.svg" height="24px"/></a>
 
 ## Author
 Shunsuke Wakamatsu (a.k.a mazrean)

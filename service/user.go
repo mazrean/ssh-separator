@@ -110,17 +110,20 @@ func (u *User) ResetContainer(ctx context.Context, userName values.UserName) err
 var (
 	// ErrInvalidUser invalid user
 	ErrInvalidUser = errors.New("invalid user")
-	// ErrIncorrectPassword incorrect password
-	ErrIncorrectPassword = errors.New("incorrect password")
 )
 
 func (u *User) Auth(ctx context.Context, name values.UserName, password values.Password) (bool, error) {
 	var hashedPassword values.HashedPassword
+	var userNotExist bool
 	err := u.rt.RTransaction(ctx, func(ctx context.Context) error {
 		var err error
 		hashedPassword, err = u.ru.GetPassword(ctx, name)
 		if errors.Is(err, repository.ErrUserNotExist) {
-			return ErrInvalidUser
+			userNotExist = true
+			// Use dummy hash to prevent timing attacks
+			// This is a valid bcrypt hash generated with cost 10
+			hashedPassword = "$2a$10$AAAAAAAAAAAAAAAAAAAAAO1234567890123456789012345678"
+			return nil
 		}
 		if err != nil {
 			return fmt.Errorf("get password error: %w", err)
@@ -132,9 +135,10 @@ func (u *User) Auth(ctx context.Context, name values.UserName, password values.P
 		return false, fmt.Errorf("failed in transaction: %w", err)
 	}
 
+	// Execute bcrypt comparison even when user does not exist to normalize timing
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-		return false, ErrIncorrectPassword
+	if userNotExist || errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+		return false, ErrInvalidUser
 	}
 	if err != nil {
 		return false, fmt.Errorf("compare hash error: %w", err)

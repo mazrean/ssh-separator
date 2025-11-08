@@ -52,8 +52,8 @@ func NewWorkspace() (*Workspace, error) {
 	memoryLimit = int64(floatMemoryLimit * 1e6)
 
 	// Read max connections per user from environment variable
-	maxConnectionsPerUserStr := os.Getenv("MAX_CONNECTIONS_PER_USER")
-	if maxConnectionsPerUserStr == "" {
+	maxConnectionsPerUserStr, ok := os.LookupEnv("MAX_CONNECTIONS_PER_USER")
+	if !ok || maxConnectionsPerUserStr == "" {
 		maxConnectionsPerUser = 10 // Default value
 	} else {
 		maxConnectionsPerUserInt, err := strconv.ParseInt(maxConnectionsPerUserStr, 10, 32)

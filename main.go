@@ -30,9 +30,9 @@ func main() {
 	}
 
 	// Read max total connections from environment variable
-	maxTotalConnectionsStr := os.Getenv("MAX_TOTAL_CONNECTIONS")
+	maxTotalConnectionsStr, ok := os.LookupEnv("MAX_TOTAL_CONNECTIONS")
 	var maxTotalConnections int32
-	if maxTotalConnectionsStr == "" {
+	if !ok || maxTotalConnectionsStr == "" {
 		maxTotalConnections = 100 // Default value
 	} else {
 		maxTotalConnectionsInt, err := strconv.ParseInt(maxTotalConnectionsStr, 10, 32)

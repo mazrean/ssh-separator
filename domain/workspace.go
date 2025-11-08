@@ -8,20 +8,22 @@ import (
 )
 
 type Workspace struct {
-	id            values.WorkspaceID
-	name          values.WorkspaceName
-	userName      values.UserName
-	Status        values.WorkspaceStatus
-	connectionNum int32
+	id             values.WorkspaceID
+	name           values.WorkspaceName
+	userName       values.UserName
+	Status         values.WorkspaceStatus
+	connectionNum  int32
+	maxConnections int32
 }
 
-func NewWorkspace(id values.WorkspaceID, name values.WorkspaceName, userName values.UserName) *Workspace {
+func NewWorkspace(id values.WorkspaceID, name values.WorkspaceName, userName values.UserName, maxConnections int32) *Workspace {
 	return &Workspace{
-		id:            id,
-		name:          name,
-		userName:      userName,
-		Status:        values.StatusDown,
-		connectionNum: 0,
+		id:             id,
+		name:           name,
+		userName:       userName,
+		Status:         values.StatusDown,
+		connectionNum:  0,
+		maxConnections: maxConnections,
 	}
 }
 
@@ -42,9 +44,16 @@ func (w *Workspace) ConnectionNum() int32 {
 }
 
 func (w *Workspace) AddConnection() error {
-	atomic.AddInt32(&w.connectionNum, 1)
-
-	return nil
+	// Check if adding a connection would exceed the limit
+	for {
+		current := atomic.LoadInt32(&w.connectionNum)
+		if current >= w.maxConnections {
+			return ErrTooManyConnections
+		}
+		if atomic.CompareAndSwapInt32(&w.connectionNum, current, current+1) {
+			return nil
+		}
+	}
 }
 
 func (w *Workspace) RemoveConnection() error {

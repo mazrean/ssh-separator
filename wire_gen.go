@@ -9,6 +9,7 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
+	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/repository"
 	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/service"
@@ -21,7 +22,7 @@ import (
 
 // Injectors from wire.go:
 
-func InjectServer(apiKey string) (*Server, func(), error) {
+func InjectServer(apiKey string, connectionLimiter *domain.ConnectionLimiter) (*Server, func(), error) {
 	workspace, err := docker.NewWorkspace()
 	if err != nil {
 		return nil, nil, err
@@ -38,7 +39,7 @@ func InjectServer(apiKey string) (*Server, func(), error) {
 	apiUser := api.NewUser(serviceUser, apiKey)
 	apiAPI := api.NewAPI(apiUser)
 	workspaceConnection := docker.NewWorkspaceConnection()
-	pipe := service.NewPipe(gomapWorkspace, workspaceConnection, workspace)
+	pipe := service.NewPipe(gomapWorkspace, workspaceConnection, workspace, connectionLimiter)
 	sshSSH := ssh.NewSSH(serviceUser, pipe)
 	server, err := NewServer(setup, apiAPI, sshSSH)
 	if err != nil {

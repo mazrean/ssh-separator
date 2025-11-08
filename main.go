@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
@@ -28,7 +29,23 @@ func main() {
 		panic(err)
 	}
 
-	server, close, err := InjectServer(apiKey)
+	// Read max total connections from environment variable
+	maxTotalConnectionsStr := os.Getenv("MAX_TOTAL_CONNECTIONS")
+	var maxTotalConnections int32
+	if maxTotalConnectionsStr == "" {
+		maxTotalConnections = 100 // Default value
+	} else {
+		maxTotalConnectionsInt, err := strconv.ParseInt(maxTotalConnectionsStr, 10, 32)
+		if err != nil {
+			panic(fmt.Errorf("invalid max total connections: %w", err))
+		}
+		maxTotalConnections = int32(maxTotalConnectionsInt)
+	}
+
+	// Create global connection limiter
+	connectionLimiter := domain.NewConnectionLimiter(maxTotalConnections)
+
+	server, close, err := InjectServer(apiKey, connectionLimiter)
 	if err != nil {
 		panic(err)
 	}

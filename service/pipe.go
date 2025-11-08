@@ -27,17 +27,26 @@ type Pipe struct {
 	sw  store.IWorkspace
 	wwc workspace.IWorkspaceConnection
 	ww  workspace.IWorkspace
+	cl  *domain.ConnectionLimiter
 }
 
-func NewPipe(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace) *Pipe {
+func NewPipe(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace, cl *domain.ConnectionLimiter) *Pipe {
 	return &Pipe{
 		sw:  sw,
 		wwc: wwc,
 		ww:  ww,
+		cl:  cl,
 	}
 }
 
 func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *domain.Connection) error {
+	// Check global connection limit first
+	err := p.cl.TryAcquire()
+	if err != nil {
+		return fmt.Errorf("global connection limit reached: %w", err)
+	}
+	defer p.cl.Release()
+
 	workspace, err := p.sw.Get(ctx, userName)
 	if err != nil {
 		return fmt.Errorf("failed to get workspace: %w", err)

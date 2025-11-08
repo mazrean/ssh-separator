@@ -20,9 +20,10 @@ const (
 )
 
 var (
-	stopTimeout = 10
-	cpuLimit    int64
-	memoryLimit int64
+	stopTimeout            = 10
+	cpuLimit               int64
+	memoryLimit            int64
+	maxConnectionsPerUser  int32
 )
 
 var containerCounter = promauto.NewGaugeVec(prometheus.GaugeOpts{
@@ -50,6 +51,18 @@ func NewWorkspace() (*Workspace, error) {
 	}
 	memoryLimit = int64(floatMemoryLimit * 1e6)
 
+	// Read max connections per user from environment variable
+	maxConnectionsPerUserStr := os.Getenv("MAX_CONNECTIONS_PER_USER")
+	if maxConnectionsPerUserStr == "" {
+		maxConnectionsPerUser = 10 // Default value
+	} else {
+		maxConnectionsPerUserInt, err := strconv.ParseInt(maxConnectionsPerUserStr, 10, 32)
+		if err != nil {
+			return nil, fmt.Errorf("invalid max connections per user: %w", err)
+		}
+		maxConnectionsPerUser = int32(maxConnectionsPerUserInt)
+	}
+
 	return &Workspace{}, nil
 }
 
@@ -75,7 +88,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 		workspaceName := values.NewWorkspaceName(ctnName)
 		containerCounter.WithLabelValues(downLabel).Inc()
 
-		return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
+		return domain.NewWorkspace(workspaceID, workspaceName, userName, maxConnectionsPerUser), nil
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to create container: %w", err)
@@ -85,7 +98,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 	workspaceName := values.NewWorkspaceName(ctnName)
 	containerCounter.WithLabelValues(downLabel).Inc()
 
-	return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
+	return domain.NewWorkspace(workspaceID, workspaceName, userName, maxConnectionsPerUser), nil
 }
 
 func (w *Workspace) Start(ctx context.Context, workspace *domain.Workspace) error {
@@ -145,5 +158,5 @@ func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (
 	workspaceID := values.NewWorkspaceID(res.ID)
 	workspaceName := values.NewWorkspaceName(ctnName)
 
-	return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
+	return domain.NewWorkspace(workspaceID, workspaceName, userName, maxConnectionsPerUser), nil
 }

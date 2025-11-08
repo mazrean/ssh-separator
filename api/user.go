@@ -39,7 +39,7 @@ func (u *User) PostNewUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("failed to bind request: %w", err))
 	}
 
-	err = u.Validate.Struct(req)
+	err = u.Struct(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -58,7 +58,7 @@ func (u *User) PostNewUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	err = u.User.New(c.Request().Context(), userName, password)
+	err = u.New(c.Request().Context(), userName, password)
 	if errors.Is(err, service.ErrUserExist) {
 		return echo.NewHTTPError(http.StatusBadRequest, "user already exist")
 	}
@@ -81,7 +81,7 @@ func (u *User) PutReset(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("failed to bind request: %w", err))
 	}
 
-	err = u.Validate.Struct(req)
+	err = u.Struct(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -100,7 +100,7 @@ func (u *User) PutReset(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	err = u.User.ResetContainer(c.Request().Context(), userName)
+	err = u.ResetContainer(c.Request().Context(), userName)
 	if errors.Is(err, service.ErrInvalidUser) {
 		return echo.NewHTTPError(http.StatusBadRequest, "no user")
 	}

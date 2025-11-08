@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/errdefs"
 	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/domain/values"
 	"github.com/prometheus/client_golang/prometheus"
@@ -20,9 +20,10 @@ const (
 )
 
 var (
-	stopTimeout = 10
-	cpuLimit    int64
-	memoryLimit int64
+	stopTimeout           = 10
+	cpuLimit              int64
+	memoryLimit           int64
+	maxConnectionsPerUser = int64(5)
 )
 
 var containerCounter = promauto.NewGaugeVec(prometheus.GaugeOpts{
@@ -50,6 +51,16 @@ func NewWorkspace() (*Workspace, error) {
 	}
 	memoryLimit = int64(floatMemoryLimit * 1e6)
 
+	// Read max connections per user from environment variable
+	maxConnectionsPerUserStr, ok := os.LookupEnv("MAX_CONNECTIONS_PER_USER")
+	if ok && maxConnectionsPerUserStr != "" {
+		maxConnectionsPerUserInt, err := strconv.ParseInt(maxConnectionsPerUserStr, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid max connections per user: %w", err)
+		}
+		maxConnectionsPerUser = maxConnectionsPerUserInt
+	}
+
 	return &Workspace{}, nil
 }
 
@@ -75,7 +86,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 		workspaceName := values.NewWorkspaceName(ctnName)
 		containerCounter.WithLabelValues(downLabel).Inc()
 
-		return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
+		return domain.NewWorkspace(workspaceID, workspaceName, userName, maxConnectionsPerUser), nil
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to create container: %w", err)
@@ -85,7 +96,7 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 	workspaceName := values.NewWorkspaceName(ctnName)
 	containerCounter.WithLabelValues(downLabel).Inc()
 
-	return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
+	return domain.NewWorkspace(workspaceID, workspaceName, userName, maxConnectionsPerUser), nil
 }
 
 func (w *Workspace) Start(ctx context.Context, workspace *domain.Workspace) error {
@@ -145,5 +156,5 @@ func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (
 	workspaceID := values.NewWorkspaceID(res.ID)
 	workspaceName := values.NewWorkspaceName(ctnName)
 
-	return domain.NewWorkspace(workspaceID, workspaceName, userName), nil
+	return domain.NewWorkspace(workspaceID, workspaceName, userName, maxConnectionsPerUser), nil
 }

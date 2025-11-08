@@ -29,7 +29,7 @@ func testSet(t *testing.T) {
 		t.Errorf("Error creating test user name: %s", err)
 	}
 
-	testWorkspace := domain.NewWorkspace("test", "testWorkspace", testUserName)
+	testWorkspace := domain.NewWorkspace("test", "testWorkspace", testUserName, 10)
 
 	tests := []struct {
 		description string
@@ -85,7 +85,7 @@ func testGet(t *testing.T) {
 		t.Errorf("Error creating test user name: %s", err)
 	}
 
-	testWorkspace := domain.NewWorkspace("test", "testWorkspace", testUserName)
+	testWorkspace := domain.NewWorkspace("test", "testWorkspace", testUserName, 10)
 
 	tests := []struct {
 		description string

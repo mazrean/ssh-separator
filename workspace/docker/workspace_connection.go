@@ -43,7 +43,7 @@ func (wc *WorkspaceConnection) Connect(ctx context.Context, workspace *domain.Wo
 	return domain.NewWorkspaceConnection(connectionID, connectionIO), nil
 }
 
-func (wc *WorkspaceConnection) Disconnect(ctx context.Context, connection *domain.WorkspaceConnection) error {
+func (wc *WorkspaceConnection) Disconnect(_ context.Context, connection *domain.WorkspaceConnection) error {
 	err := connection.ReadCloser().Close()
 	if err != nil {
 		return fmt.Errorf("failed to close reader: %w", err)

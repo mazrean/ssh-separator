@@ -26,11 +26,11 @@ func testCreate(t *testing.T) {
 	t.Parallel()
 	t.Helper()
 
-	db, close, err := newTestDB("user_create")
+	db, closeFn, err := newTestDB("user_create")
 	if err != nil {
 		t.Errorf("failed to create test db: %v", err)
 	}
-	defer close()
+	defer closeFn()
 
 	user := NewUser(db)
 
@@ -167,11 +167,11 @@ func testCreate(t *testing.T) {
 func testGetPassword(t *testing.T) {
 	t.Parallel()
 
-	db, close, err := newTestDB("user_get_password")
+	db, closeFn, err := newTestDB("user_get_password")
 	if err != nil {
 		t.Errorf("failed to create test db: %v", err)
 	}
-	defer close()
+	defer closeFn()
 
 	user := NewUser(db)
 
@@ -284,11 +284,11 @@ func testGetPassword(t *testing.T) {
 func testGetAllUser(t *testing.T) {
 	t.Parallel()
 
-	db, close, err := newTestDB("user_get_all_user")
+	db, closeFn, err := newTestDB("user_get_all_user")
 	if err != nil {
 		t.Errorf("failed to create test db: %v", err)
 	}
-	defer close()
+	defer closeFn()
 
 	user := NewUser(db)
 

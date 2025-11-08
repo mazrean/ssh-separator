@@ -1,10 +1,11 @@
-//+build wireinject
+//go:build wireinject
 
 package main
 
 import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
+	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/repository"
 	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/service"
@@ -39,7 +40,7 @@ func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 	}, nil
 }
 
-func InjectServer(apiKey string) (*Server, func(), error) {
+func InjectServer(apiKey string, connectionLimiter *domain.ConnectionLimiter) (*Server, func(), error) {
 	wire.Build(
 		NewServer,
 		api.NewAPI,

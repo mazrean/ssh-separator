@@ -60,7 +60,15 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 		if isTty {
 			go func(winCh <-chan ssh.Window, newWinCh chan<- *values.Window) {
 				for win := range winCh {
-					newWinCh <- values.NewWindow(uint(win.Height), uint(win.Width))
+					height := uint(win.Height)
+					if win.Height < 0 {
+						height = 0
+					}
+					width := uint(win.Width)
+					if win.Width < 0 {
+						width = 0
+					}
+					newWinCh <- values.NewWindow(height, width)
 				}
 			}(winCh, newWinCh)
 		}
@@ -88,8 +96,8 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 }
 
 func (ssh *SSH) Start(port int) error {
-	ssh.Server.Addr = fmt.Sprintf(":%d", port)
-	err := ssh.Server.ListenAndServe()
+	ssh.Addr = fmt.Sprintf(":%d", port)
+	err := ssh.ListenAndServe()
 	if err != nil {
 		return fmt.Errorf("listen and serve error: %w", err)
 	}

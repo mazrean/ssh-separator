@@ -8,20 +8,22 @@ import (
 )
 
 type Workspace struct {
-	id            values.WorkspaceID
-	name          values.WorkspaceName
-	userName      values.UserName
-	Status        values.WorkspaceStatus
-	connectionNum int32
+	id             values.WorkspaceID
+	name           values.WorkspaceName
+	userName       values.UserName
+	Status         values.WorkspaceStatus
+	connectionNum  int64
+	maxConnections int64
 }
 
-func NewWorkspace(id values.WorkspaceID, name values.WorkspaceName, userName values.UserName) *Workspace {
+func NewWorkspace(id values.WorkspaceID, name values.WorkspaceName, userName values.UserName, maxConnections int64) *Workspace {
 	return &Workspace{
-		id:            id,
-		name:          name,
-		userName:      userName,
-		Status:        values.StatusDown,
-		connectionNum: 0,
+		id:             id,
+		name:           name,
+		userName:       userName,
+		Status:         values.StatusDown,
+		connectionNum:  0,
+		maxConnections: maxConnections,
 	}
 }
 
@@ -37,14 +39,21 @@ func (w *Workspace) UserName() values.UserName {
 	return w.userName
 }
 
-func (w *Workspace) ConnectionNum() int32 {
+func (w *Workspace) ConnectionNum() int64 {
 	return w.connectionNum
 }
 
 func (w *Workspace) AddConnection() error {
-	atomic.AddInt32(&w.connectionNum, 1)
-
-	return nil
+	// Check if adding a connection would exceed the limit
+	for {
+		current := atomic.LoadInt64(&w.connectionNum)
+		if current >= w.maxConnections {
+			return ErrTooManyConnections
+		}
+		if atomic.CompareAndSwapInt64(&w.connectionNum, current, current+1) {
+			return nil
+		}
+	}
 }
 
 func (w *Workspace) RemoveConnection() error {
@@ -52,7 +61,7 @@ func (w *Workspace) RemoveConnection() error {
 		return errors.New("no connection")
 	}
 
-	atomic.AddInt32(&w.connectionNum, -1)
+	atomic.AddInt64(&w.connectionNum, -1)
 
 	return nil
 }

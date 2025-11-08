@@ -110,8 +110,6 @@ func (u *User) ResetContainer(ctx context.Context, userName values.UserName) err
 var (
 	// ErrInvalidUser invalid user
 	ErrInvalidUser = errors.New("invalid user")
-	// ErrIncorrectPassword incorrect password
-	ErrIncorrectPassword = errors.New("incorrect password")
 )
 
 func (u *User) Auth(ctx context.Context, name values.UserName, password values.Password) (bool, error) {
@@ -139,11 +137,8 @@ func (u *User) Auth(ctx context.Context, name values.UserName, password values.P
 
 	// Execute bcrypt comparison even when user does not exist to normalize timing
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	if userNotExist {
+	if userNotExist || errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 		return false, ErrInvalidUser
-	}
-	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-		return false, ErrIncorrectPassword
 	}
 	if err != nil {
 		return false, fmt.Errorf("compare hash error: %w", err)

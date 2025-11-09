@@ -59,6 +59,12 @@ func NewSSH(user service.IUser, pipe service.IPipe) *SSH {
 		defer close(newWinCh)
 		if isTty {
 			go func(winCh <-chan ssh.Window, newWinCh chan<- *values.Window) {
+				defer func() {
+					if err := recover(); err != nil {
+						log.Printf("panic in window change: %+v\n", err)
+					}
+				}()
+
 				for win := range winCh {
 					height := uint(win.Height)
 					if win.Height < 0 {

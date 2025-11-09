@@ -14,11 +14,11 @@ type Config struct {
 	API struct {
 		Port int    `env:"API_PORT" default:"3000" help:"API server port"`
 		Key  string `env:"API_KEY" required:"" help:"API authentication key (required for API authentication)"`
-	} `embed:"" prefix:""`
+	} `embed:"" prefix:"api-"`
 
 	SSH struct {
 		Port int `env:"SSH_PORT" default:"2222" help:"SSH server port"`
-	} `embed:"" prefix:""`
+	} `embed:"" prefix:"ssh-"`
 
 	Docker struct {
 		LocalImage  bool    `env:"LOCAL_IMAGE" default:"false" help:"Use local Docker image"`
@@ -32,7 +32,7 @@ type Config struct {
 	Connection struct {
 		MaxGlobal  int64 `env:"MAX_GLOBAL_CONNECTIONS" default:"1000" help:"Maximum total connections"`
 		MaxPerUser int64 `env:"MAX_CONNECTIONS_PER_USER" default:"5" help:"Maximum connections per user"`
-	} `embed:"" prefix:""`
+	} `embed:"" prefix:"connection-"`
 
 	RateLimit struct {
 		Rate      int `env:"RATE_LIMIT_RATE" default:"5" help:"Rate limit requests per second"`
@@ -42,7 +42,7 @@ type Config struct {
 
 	Badger struct {
 		Dir string `env:"BADGER_DIR" default:"/var/lib/ssh-separator/badger" help:"Badger database directory"`
-	} `embed:"" prefix:""`
+	} `embed:"" prefix:"data-"`
 
 	Prometheus bool   `env:"PROMETHEUS" default:"true" help:"Enable Prometheus metrics"`
 	Welcome    string `env:"WELCOME" help:"Welcome message displayed on SSH connection"`

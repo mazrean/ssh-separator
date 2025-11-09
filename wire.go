@@ -15,8 +15,6 @@ import (
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
-type BadgerDir string
-
 var (
 	transactionBind         = wire.Bind(new(repository.ITransaction), new(*badger.Transaction))
 	storeWorkspaceBind      = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))

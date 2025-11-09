@@ -52,8 +52,6 @@ func InjectServer(apiKey api.Key, badgerDir badger.Dir, maxGlobalConnections ser
 
 // wire.go:
 
-type BadgerDir string
-
 var (
 	transactionBind         = wire.Bind(new(repository.ITransaction), new(*badger.Transaction))
 	storeWorkspaceBind      = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))

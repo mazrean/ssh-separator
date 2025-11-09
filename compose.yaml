@@ -4,15 +4,7 @@ services:
   ssh-server:
     image: ghcr.io/mazrean/ssh-separator:latest
     environment:
-      API_PORT: 3000
-      SSH_PORT: 2222
-      BADGER_DIR: /tmp/badger
-      IMAGE_NAME: ghcr.io/mazrean/ssh-separator-ubuntu:latest
-      IMAGE_USER: ubuntu
-      IMAGE_CMD: /bin/bash
       API_KEY: api_key # key for the REST API. you need to rewrite this in production.
-      CPU_LIMIT: 0.1
-      MEMORY_LIMIT: 1024
     ports:
       - 2222:2222
       - 3000:3000

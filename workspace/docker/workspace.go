@@ -3,8 +3,6 @@ package docker
 import (
 	"context"
 	"fmt"
-	"os"
-	"strconv"
 
 	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
@@ -19,11 +17,13 @@ const (
 	downLabel = "down"
 )
 
+type MaxConnectionsPerUser int64
+
 var (
 	stopTimeout           = 10
 	cpuLimit              int64
 	memoryLimit           int64
-	maxConnectionsPerUser = int64(5)
+	maxConnectionsPerUser int64
 )
 
 var containerCounter = promauto.NewGaugeVec(prometheus.GaugeOpts{
@@ -38,29 +38,8 @@ func containerName(userName values.UserName) string {
 
 type Workspace struct{}
 
-func NewWorkspace() (*Workspace, error) {
-	floatCPULimit, err := strconv.ParseFloat(os.Getenv("CPU_LIMIT"), 64)
-	if err != nil {
-		return nil, fmt.Errorf("invalid cpu limit: %w", err)
-	}
-	cpuLimit = int64(floatCPULimit * 1e9)
-
-	floatMemoryLimit, err := strconv.ParseFloat(os.Getenv("MEMORY_LIMIT"), 64)
-	if err != nil {
-		return nil, fmt.Errorf("invalid memory limit: %w", err)
-	}
-	memoryLimit = int64(floatMemoryLimit * 1e6)
-
-	// Read max connections per user from environment variable
-	maxConnectionsPerUserStr, ok := os.LookupEnv("MAX_CONNECTIONS_PER_USER")
-	if ok && maxConnectionsPerUserStr != "" {
-		maxConnectionsPerUserInt, err := strconv.ParseInt(maxConnectionsPerUserStr, 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid max connections per user: %w", err)
-		}
-		maxConnectionsPerUser = maxConnectionsPerUserInt
-	}
-
+func NewWorkspace(maxConnPerUser MaxConnectionsPerUser) (*Workspace, error) {
+	maxConnectionsPerUser = int64(maxConnPerUser)
 	return &Workspace{}, nil
 }
 

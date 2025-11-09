@@ -5,14 +5,6 @@ services:
     environment:
       WELCOME: "Login success!"
       PROMETHEUS: "true"
-      API_PORT: 3000
-      SSH_PORT: 2222
-      BADGER_DIR: /tmp/badger
-      IMAGE_NAME: ghcr.io/mazrean/ssh-separator-ubuntu:latest
-      IMAGE_USER: ubuntu
-      IMAGE_CMD: /bin/bash
-      CPU_LIMIT: 0.1
-      MEMORY_LIMIT: 1024
       API_KEY: api_key
     ports:
       - 2222:2222
@@ -20,7 +12,7 @@ services:
       - 2345:2345
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ../badger:/tmp/badger
+      - ../badger:/var/lib/ssh-separator/badger
     security_opt:
       - apparmor:unconfined
     cap_add:

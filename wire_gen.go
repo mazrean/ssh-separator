@@ -9,7 +9,6 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
-	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/repository"
 	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/service"
@@ -22,13 +21,13 @@ import (
 
 // Injectors from wire.go:
 
-func InjectServer(apiKey string, connectionLimiter *domain.ConnectionLimiter) (*Server, func(), error) {
-	workspace, err := docker.NewWorkspace()
+func InjectServer(apiKey api.Key, badgerDir badger.Dir, maxGlobalConnections service.MaxGlobalConnections, maxConnPerUser docker.MaxConnectionsPerUser, apiConfig api.Config, welcome service.WelcomeMessage) (*Server, func(), error) {
+	workspace, err := docker.NewWorkspace(maxConnPerUser)
 	if err != nil {
 		return nil, nil, err
 	}
 	gomapWorkspace := gomap.NewWorkspace()
-	db, cleanup, err := badger.NewDB()
+	db, cleanup, err := badger.NewDB(badgerDir)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -37,9 +36,9 @@ func InjectServer(apiKey string, connectionLimiter *domain.ConnectionLimiter) (*
 	setup := service.NewSetup(workspace, gomapWorkspace, transaction, user)
 	serviceUser := service.NewUser(workspace, gomapWorkspace, user, transaction)
 	apiUser := api.NewUser(serviceUser, apiKey)
-	apiAPI := api.NewAPI(apiUser)
+	apiAPI := api.NewAPI(apiUser, apiConfig)
 	workspaceConnection := docker.NewWorkspaceConnection()
-	pipe := service.NewPipe(gomapWorkspace, workspaceConnection, workspace, connectionLimiter)
+	pipe := service.NewPipe(gomapWorkspace, workspaceConnection, workspace, maxGlobalConnections, welcome)
 	sshSSH := ssh.NewSSH(serviceUser, pipe)
 	server, err := NewServer(setup, apiAPI, sshSSH)
 	if err != nil {

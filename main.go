@@ -2,48 +2,86 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 
-	"github.com/mazrean/separated-webshell/domain"
+	"github.com/alecthomas/kong"
+	"github.com/mazrean/separated-webshell/api"
+	"github.com/mazrean/separated-webshell/repository/badger"
+	"github.com/mazrean/separated-webshell/service"
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
+type Config struct {
+	API struct {
+		Port int    `env:"API_PORT" default:"3000" help:"API server port"`
+		Key  string `env:"API_KEY" required:"" help:"API authentication key (required for API authentication)"`
+	} `embed:"" prefix:"api-"`
+
+	SSH struct {
+		Port int `env:"SSH_PORT" default:"2222" help:"SSH server port"`
+	} `embed:"" prefix:"ssh-"`
+
+	Docker struct {
+		LocalImage  bool    `env:"LOCAL_IMAGE" default:"false" help:"Use local Docker image"`
+		ImageName   string  `env:"IMAGE_NAME" default:"ghcr.io/mazrean/ssh-separator-ubuntu:latest" help:"Docker image name"`
+		ImageUser   string  `env:"IMAGE_USER" default:"ubuntu" help:"Docker image user"`
+		ImageCmd    string  `env:"IMAGE_CMD" default:"/bin/bash" help:"Docker image command"`
+		CPULimit    float64 `env:"CPU_LIMIT" default:"1.0" help:"CPU limit for containers (in CPU cores)"`
+		MemoryLimit float64 `env:"MEMORY_LIMIT" default:"1024" help:"Memory limit for containers (in MB)"`
+	} `embed:"" prefix:""`
+
+	Connection struct {
+		MaxGlobal  int64 `env:"MAX_GLOBAL_CONNECTIONS" default:"1000" help:"Maximum total connections"`
+		MaxPerUser int64 `env:"MAX_CONNECTIONS_PER_USER" default:"5" help:"Maximum connections per user"`
+	} `embed:"" prefix:"connection-"`
+
+	RateLimit struct {
+		Rate      int `env:"RATE_LIMIT_RATE" default:"5" help:"Rate limit requests per second"`
+		Burst     int `env:"RATE_LIMIT_BURST" default:"5" help:"Rate limit burst size"`
+		ExpiresIn int `env:"RATE_LIMIT_EXPIRES_IN" default:"60" help:"Rate limit expiration in seconds"`
+	} `embed:"" prefix:""`
+
+	Badger struct {
+		Dir string `env:"BADGER_DIR" default:"/var/lib/ssh-separator/badger" help:"Badger database directory"`
+	} `embed:"" prefix:"data-"`
+
+	Prometheus bool   `env:"PROMETHEUS" default:"true" help:"Enable Prometheus metrics"`
+	Welcome    string `env:"WELCOME" help:"Welcome message displayed on SSH connection"`
+}
+
 func main() {
-	strAPIPort := os.Getenv("API_PORT")
-	strSSHPort := os.Getenv("SSH_PORT")
-	apiKey, ok := os.LookupEnv("API_KEY")
+	var config Config
+	kong.Parse(&config,
+		kong.Name("ssh-separator"),
+		kong.Description("Separated Web Shell - SSH to Docker container gateway"),
+		kong.UsageOnError(),
+	)
 
-	// API_KEY環境変数の検証
-	if !ok || apiKey == "" {
-		panic(fmt.Errorf("API_KEY environment variable is not set or empty. This is required for API authentication"))
+	// Set Docker configuration
+	docker.SetConfig(docker.Config{
+		LocalImage:  config.Docker.LocalImage,
+		ImageName:   config.Docker.ImageName,
+		ImageUser:   config.Docker.ImageUser,
+		ImageCmd:    config.Docker.ImageCmd,
+		CPULimit:    config.Docker.CPULimit,
+		MemoryLimit: config.Docker.MemoryLimit,
+	})
+
+	// Create API configuration
+	apiConfig := api.Config{
+		Prometheus:         config.Prometheus,
+		RateLimitRate:      config.RateLimit.Rate,
+		RateLimitBurst:     config.RateLimit.Burst,
+		RateLimitExpiresIn: config.RateLimit.ExpiresIn,
 	}
 
-	apiPort, err := strconv.Atoi(strAPIPort)
-	if err != nil {
-		panic(err)
-	}
-
-	sshPort, err := strconv.Atoi(strSSHPort)
-	if err != nil {
-		panic(err)
-	}
-
-	// Read max total connections from environment variable
-	maxTotalConnectionsStr, ok := os.LookupEnv("MAX_TOTAL_CONNECTIONS")
-	maxTotalConnections := int64(1000) // Default value
-	if ok && maxTotalConnectionsStr != "" {
-		maxTotalConnectionsInt, err := strconv.ParseInt(maxTotalConnectionsStr, 10, 64)
-		if err != nil {
-			panic(fmt.Errorf("invalid max total connections: %w", err))
-		}
-		maxTotalConnections = maxTotalConnectionsInt
-	}
-
-	// Create global connection limiter
-	connectionLimiter := domain.NewConnectionLimiter(maxTotalConnections)
-
-	server, closeFn, err := InjectServer(apiKey, connectionLimiter)
+	server, closeFn, err := InjectServer(
+		api.Key(config.API.Key),
+		badger.Dir(config.Badger.Dir),
+		service.MaxGlobalConnections(config.Connection.MaxGlobal),
+		docker.MaxConnectionsPerUser(config.Connection.MaxPerUser),
+		apiConfig,
+		service.WelcomeMessage(config.Welcome),
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -59,12 +97,12 @@ func main() {
 		panic(fmt.Errorf("failed to setup service: %w", err))
 	}
 
-	api := server.API
+	apiServer := server.API
 	ssh := server.SSH
 
 	go func() {
-		panic(api.Start(apiPort))
+		panic(apiServer.Start(config.API.Port))
 	}()
 
-	panic(ssh.Start(sshPort))
+	panic(ssh.Start(config.SSH.Port))
 }

@@ -2,7 +2,6 @@ package badger
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 
 	badger "github.com/dgraph-io/badger/v3"
@@ -10,13 +9,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
+type Dir string
+
 type DB struct {
 	DB          *badger.DB
 	userCounter prometheus.Counter
 }
 
-func NewDB() (*DB, func(), error) {
-	return newDB(os.Getenv("BADGER_DIR"), "webshell")
+func NewDB(badgerDir Dir) (*DB, func(), error) {
+	return newDB(string(badgerDir), "webshell")
 }
 
 func newDB(dir string, prometheusNameSpace string) (*DB, func(), error) {

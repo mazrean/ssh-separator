@@ -11,12 +11,30 @@ import (
 )
 
 var (
-	isLocalImage = os.Getenv("LOCAL_IMAGE")
-	imageRef     = os.Getenv("IMAGE_NAME")
-	imageUser    = os.Getenv("IMAGE_USER")
-	imageCmd     = os.Getenv("IMAGE_CMD")
+	isLocalImage bool
+	imageRef     string
+	imageUser    string
+	imageCmd     string
 	cli          *client.Client
 )
+
+type Config struct {
+	LocalImage  bool
+	ImageName   string
+	ImageUser   string
+	ImageCmd    string
+	CPULimit    float64
+	MemoryLimit float64
+}
+
+func SetConfig(config Config) {
+	isLocalImage = config.LocalImage
+	imageRef = config.ImageName
+	imageUser = config.ImageUser
+	imageCmd = config.ImageCmd
+	cpuLimit = int64(config.CPULimit * 1e9)
+	memoryLimit = int64(config.MemoryLimit * 1e6)
+}
 
 func Setup() error {
 	var err error
@@ -27,7 +45,7 @@ func Setup() error {
 
 	ctx := context.Background()
 
-	if len(isLocalImage) == 0 || isLocalImage == "false" {
+	if !isLocalImage {
 		reader, err := cli.ImagePull(ctx, imageRef, image.PullOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to pull image: %w", err)

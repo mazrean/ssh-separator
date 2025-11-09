@@ -25,6 +25,7 @@ type Config struct {
 	ImageCmd    string
 	CPULimit    float64
 	MemoryLimit float64
+	PidsLimit   int64
 }
 
 func SetConfig(config Config) {
@@ -34,6 +35,7 @@ func SetConfig(config Config) {
 	imageCmd = config.ImageCmd
 	cpuLimit = int64(config.CPULimit * 1e9)
 	memoryLimit = int64(config.MemoryLimit * 1e6)
+	pidsLimit = config.PidsLimit
 }
 
 func Setup() error {

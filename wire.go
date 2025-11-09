@@ -16,6 +16,10 @@ import (
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
+type BadgerDir string
+type APIKey string
+type WelcomeMessage string
+
 var (
 	transactionBind         = wire.Bind(new(repository.ITransaction), new(*badger.Transaction))
 	storeWorkspaceBind      = wire.Bind(new(store.IWorkspace), new(*gomap.Workspace))
@@ -40,21 +44,79 @@ func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 	}, nil
 }
 
-func InjectServer(apiKey string, connectionLimiter *domain.ConnectionLimiter) (*Server, func(), error) {
+func provideAPIKeyForUser(key APIKey) string {
+	return string(key)
+}
+
+func provideBadgerDirForDB(dir BadgerDir) string {
+	return string(dir)
+}
+
+func provideWelcomeForPipe(msg WelcomeMessage) string {
+	return string(msg)
+}
+
+type DBConfig struct {
+	Dir string
+}
+
+func provideDBConfig(dir BadgerDir) *DBConfig {
+	return &DBConfig{Dir: string(dir)}
+}
+
+func newDBFromConfig(config *DBConfig) (*badger.DB, func(), error) {
+	return badger.NewDB(config.Dir)
+}
+
+type PipeConfig struct {
+	Welcome string
+}
+
+func providePipeConfig(msg WelcomeMessage) *PipeConfig {
+	return &PipeConfig{Welcome: string(msg)}
+}
+
+func newPipeFromConfig(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace, cl *domain.ConnectionLimiter, config *PipeConfig) *service.Pipe {
+	return service.NewPipe(sw, wwc, ww, cl, config.Welcome)
+}
+
+type UserConfig struct {
+	APIKey string
+}
+
+func provideUserConfig(key APIKey) *UserConfig {
+	return &UserConfig{APIKey: string(key)}
+}
+
+func newUserFromConfig(u *service.User, config *UserConfig) *api.User {
+	return api.NewUser(u, config.APIKey)
+}
+
+func InjectServer(
+	apiKey APIKey,
+	connectionLimiter *domain.ConnectionLimiter,
+	badgerDir BadgerDir,
+	maxConnPerUser int64,
+	apiConfig api.APIConfig,
+	welcome WelcomeMessage,
+) (*Server, func(), error) {
 	wire.Build(
 		NewServer,
 		api.NewAPI,
-		api.NewUser,
+		newUserFromConfig,
 		gomap.NewWorkspace,
-		badger.NewDB,
+		newDBFromConfig,
 		badger.NewTransaction,
 		badger.NewUser,
 		service.NewSetup,
 		service.NewUser,
-		service.NewPipe,
+		newPipeFromConfig,
 		ssh.NewSSH,
 		docker.NewWorkspace,
 		docker.NewWorkspaceConnection,
+		provideDBConfig,
+		providePipeConfig,
+		provideUserConfig,
 		transactionBind,
 		storeWorkspaceBind,
 		repositoryUserBind,

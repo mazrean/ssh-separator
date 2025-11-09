@@ -41,13 +41,3 @@ func (cl *ConnectionLimiter) TryAcquire() error {
 func (cl *ConnectionLimiter) Release() {
 	atomic.AddInt64(&cl.currentConnections, -1)
 }
-
-// CurrentConnections returns the current number of connections
-func (cl *ConnectionLimiter) CurrentConnections() int64 {
-	return atomic.LoadInt64(&cl.currentConnections)
-}
-
-// MaxConnections returns the maximum number of connections allowed
-func (cl *ConnectionLimiter) MaxConnections() int64 {
-	return cl.maxConnections
-}

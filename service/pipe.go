@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/docker/docker/pkg/stdcopy"
@@ -15,27 +14,25 @@ import (
 	"github.com/mazrean/separated-webshell/workspace"
 )
 
-var (
-	welcome = os.Getenv("WELCOME")
-)
-
 type IPipe interface {
 	Pipe(ctx context.Context, userName values.UserName, connection *domain.Connection) error
 }
 
 type Pipe struct {
-	sw  store.IWorkspace
-	wwc workspace.IWorkspaceConnection
-	ww  workspace.IWorkspace
-	cl  *domain.ConnectionLimiter
+	sw      store.IWorkspace
+	wwc     workspace.IWorkspaceConnection
+	ww      workspace.IWorkspace
+	cl      *domain.ConnectionLimiter
+	welcome string
 }
 
-func NewPipe(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace, cl *domain.ConnectionLimiter) *Pipe {
+func NewPipe(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace, cl *domain.ConnectionLimiter, welcome string) *Pipe {
 	return &Pipe{
-		sw:  sw,
-		wwc: wwc,
-		ww:  ww,
-		cl:  cl,
+		sw:      sw,
+		wwc:     wwc,
+		ww:      ww,
+		cl:      cl,
+		welcome: welcome,
 	}
 }
 
@@ -102,8 +99,8 @@ func (p *Pipe) Pipe(ctx context.Context, userName values.UserName, connection *d
 	go func() {
 		defer connection.Close()
 		if connection.IsTty() {
-			if len(welcome) != 0 {
-				_, err := io.Copy(connection.Stdout(), strings.NewReader(welcome))
+			if len(p.welcome) != 0 {
+				_, err := io.Copy(connection.Stdout(), strings.NewReader(p.welcome))
 				if err != nil {
 					log.Printf("failed to copy fonts: %+v", err)
 				}

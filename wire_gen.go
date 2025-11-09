@@ -9,7 +9,6 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
-	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/repository"
 	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/service"
@@ -22,14 +21,13 @@ import (
 
 // Injectors from wire.go:
 
-func InjectServer(apiKey APIKey, connectionLimiter *domain.ConnectionLimiter, badgerDir BadgerDir, maxConnPerUser int64, apiConfig api.Config, welcome WelcomeMessage) (*Server, func(), error) {
+func InjectServer(apiKey api.Key, badgerDir badger.Dir, maxGlobalConnections service.MaxGlobalConnections, maxConnPerUser docker.MaxConnectionsPerUser, apiConfig api.Config, welcome service.WelcomeMessage) (*Server, func(), error) {
 	workspace, err := docker.NewWorkspace(maxConnPerUser)
 	if err != nil {
 		return nil, nil, err
 	}
 	gomapWorkspace := gomap.NewWorkspace()
-	dbConfig := provideDBConfig(badgerDir)
-	db, cleanup, err := newDBFromConfig(dbConfig)
+	db, cleanup, err := badger.NewDB(badgerDir)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -37,12 +35,10 @@ func InjectServer(apiKey APIKey, connectionLimiter *domain.ConnectionLimiter, ba
 	user := badger.NewUser(db)
 	setup := service.NewSetup(workspace, gomapWorkspace, transaction, user)
 	serviceUser := service.NewUser(workspace, gomapWorkspace, user, transaction)
-	userConfig := provideUserConfig(apiKey)
-	apiUser := newUserFromConfig(serviceUser, userConfig)
+	apiUser := api.NewUser(serviceUser, apiKey)
 	apiAPI := api.NewAPI(apiUser, apiConfig)
 	workspaceConnection := docker.NewWorkspaceConnection()
-	pipeConfig := providePipeConfig(welcome)
-	pipe := newPipeFromConfig(gomapWorkspace, workspaceConnection, workspace, connectionLimiter, pipeConfig)
+	pipe := service.NewPipe(gomapWorkspace, workspaceConnection, workspace, maxGlobalConnections, welcome)
 	sshSSH := ssh.NewSSH(serviceUser, pipe)
 	server, err := NewServer(setup, apiAPI, sshSSH)
 	if err != nil {
@@ -57,10 +53,6 @@ func InjectServer(apiKey APIKey, connectionLimiter *domain.ConnectionLimiter, ba
 // wire.go:
 
 type BadgerDir string
-
-type APIKey string
-
-type WelcomeMessage string
 
 var (
 	transactionBind         = wire.Bind(new(repository.ITransaction), new(*badger.Transaction))
@@ -84,52 +76,4 @@ func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 		API:   a,
 		SSH:   s,
 	}, nil
-}
-
-func provideAPIKeyForUser(key APIKey) string {
-	return string(key)
-}
-
-func provideBadgerDirForDB(dir BadgerDir) string {
-	return string(dir)
-}
-
-func provideWelcomeForPipe(msg WelcomeMessage) string {
-	return string(msg)
-}
-
-type DBConfig struct {
-	Dir string
-}
-
-func provideDBConfig(dir BadgerDir) *DBConfig {
-	return &DBConfig{Dir: string(dir)}
-}
-
-func newDBFromConfig(config *DBConfig) (*badger.DB, func(), error) {
-	return badger.NewDB(config.Dir)
-}
-
-type PipeConfig struct {
-	Welcome string
-}
-
-func providePipeConfig(msg WelcomeMessage) *PipeConfig {
-	return &PipeConfig{Welcome: string(msg)}
-}
-
-func newPipeFromConfig(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace, cl *domain.ConnectionLimiter, config *PipeConfig) *service.Pipe {
-	return service.NewPipe(sw, wwc, ww, cl, config.Welcome)
-}
-
-type UserConfig struct {
-	APIKey string
-}
-
-func provideUserConfig(key APIKey) *UserConfig {
-	return &UserConfig{APIKey: string(key)}
-}
-
-func newUserFromConfig(u *service.User, config *UserConfig) *api.User {
-	return api.NewUser(u, config.APIKey)
 }

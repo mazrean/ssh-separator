@@ -5,7 +5,8 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/mazrean/separated-webshell/api"
-	"github.com/mazrean/separated-webshell/domain"
+	"github.com/mazrean/separated-webshell/repository/badger"
+	"github.com/mazrean/separated-webshell/service"
 	"github.com/mazrean/separated-webshell/workspace/docker"
 )
 
@@ -29,7 +30,7 @@ type Config struct {
 	} `embed:"" prefix:""`
 
 	Connection struct {
-		MaxTotal   int64 `env:"MAX_TOTAL_CONNECTIONS" default:"1000" help:"Maximum total connections"`
+		MaxGlobal  int64 `env:"MAX_GLOBAL_CONNECTIONS" default:"1000" help:"Maximum total connections"`
 		MaxPerUser int64 `env:"MAX_CONNECTIONS_PER_USER" default:"5" help:"Maximum connections per user"`
 	} `embed:"" prefix:""`
 
@@ -43,7 +44,7 @@ type Config struct {
 		Dir string `env:"BADGER_DIR" default:"/var/lib/ssh-separator/badger" help:"Badger database directory"`
 	} `embed:"" prefix:""`
 
-	Prometheus bool   `env:"PROMETHEUS" default:"false" help:"Enable Prometheus metrics"`
+	Prometheus bool   `env:"PROMETHEUS" default:"true" help:"Enable Prometheus metrics"`
 	Welcome    string `env:"WELCOME" help:"Welcome message displayed on SSH connection"`
 }
 
@@ -65,9 +66,6 @@ func main() {
 		MemoryLimit: config.Docker.MemoryLimit,
 	})
 
-	// Create global connection limiter
-	connectionLimiter := domain.NewConnectionLimiter(config.Connection.MaxTotal)
-
 	// Create API configuration
 	apiConfig := api.Config{
 		Prometheus:         config.Prometheus,
@@ -77,12 +75,12 @@ func main() {
 	}
 
 	server, closeFn, err := InjectServer(
-		APIKey(config.API.Key),
-		connectionLimiter,
-		BadgerDir(config.Badger.Dir),
-		config.Connection.MaxPerUser,
+		api.Key(config.API.Key),
+		badger.Dir(config.Badger.Dir),
+		service.MaxGlobalConnections(config.Connection.MaxGlobal),
+		docker.MaxConnectionsPerUser(config.Connection.MaxPerUser),
 		apiConfig,
-		WelcomeMessage(config.Welcome),
+		service.WelcomeMessage(config.Welcome),
 	)
 	if err != nil {
 		panic(err)

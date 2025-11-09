@@ -14,6 +14,11 @@ import (
 	"github.com/mazrean/separated-webshell/workspace"
 )
 
+type (
+	WelcomeMessage       string
+	MaxGlobalConnections int64
+)
+
 type IPipe interface {
 	Pipe(ctx context.Context, userName values.UserName, connection *domain.Connection) error
 }
@@ -26,13 +31,21 @@ type Pipe struct {
 	welcome string
 }
 
-func NewPipe(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace, cl *domain.ConnectionLimiter, welcome string) *Pipe {
+func NewPipe(
+	sw store.IWorkspace,
+	wwc workspace.IWorkspaceConnection,
+	ww workspace.IWorkspace,
+	maxGlobalConnections MaxGlobalConnections,
+	welcome WelcomeMessage,
+) *Pipe {
+	cl := domain.NewConnectionLimiter(int64(maxGlobalConnections))
+
 	return &Pipe{
 		sw:      sw,
 		wwc:     wwc,
 		ww:      ww,
 		cl:      cl,
-		welcome: welcome,
+		welcome: string(welcome),
 	}
 }
 

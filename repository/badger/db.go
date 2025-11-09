@@ -9,13 +9,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
+type Dir string
+
 type DB struct {
 	DB          *badger.DB
 	userCounter prometheus.Counter
 }
 
-func NewDB(badgerDir string) (*DB, func(), error) {
-	return newDB(badgerDir, "webshell")
+func NewDB(badgerDir Dir) (*DB, func(), error) {
+	return newDB(string(badgerDir), "webshell")
 }
 
 func newDB(dir string, prometheusNameSpace string) (*DB, func(), error) {

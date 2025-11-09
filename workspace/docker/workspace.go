@@ -17,6 +17,8 @@ const (
 	downLabel = "down"
 )
 
+type MaxConnectionsPerUser int64
+
 var (
 	stopTimeout           = 10
 	cpuLimit              int64
@@ -36,8 +38,8 @@ func containerName(userName values.UserName) string {
 
 type Workspace struct{}
 
-func NewWorkspace(maxConnPerUser int64) (*Workspace, error) {
-	maxConnectionsPerUser = maxConnPerUser
+func NewWorkspace(maxConnPerUser MaxConnectionsPerUser) (*Workspace, error) {
+	maxConnectionsPerUser = int64(maxConnPerUser)
 	return &Workspace{}, nil
 }
 

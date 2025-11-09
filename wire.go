@@ -5,7 +5,6 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/mazrean/separated-webshell/api"
-	"github.com/mazrean/separated-webshell/domain"
 	"github.com/mazrean/separated-webshell/repository"
 	"github.com/mazrean/separated-webshell/repository/badger"
 	"github.com/mazrean/separated-webshell/service"
@@ -17,8 +16,6 @@ import (
 )
 
 type BadgerDir string
-type APIKey string
-type WelcomeMessage string
 
 var (
 	transactionBind         = wire.Bind(new(repository.ITransaction), new(*badger.Transaction))
@@ -44,79 +41,28 @@ func NewServer(setup *service.Setup, a *api.API, s *ssh.SSH) (*Server, error) {
 	}, nil
 }
 
-func provideAPIKeyForUser(key APIKey) string {
-	return string(key)
-}
-
-func provideBadgerDirForDB(dir BadgerDir) string {
-	return string(dir)
-}
-
-func provideWelcomeForPipe(msg WelcomeMessage) string {
-	return string(msg)
-}
-
-type DBConfig struct {
-	Dir string
-}
-
-func provideDBConfig(dir BadgerDir) *DBConfig {
-	return &DBConfig{Dir: string(dir)}
-}
-
-func newDBFromConfig(config *DBConfig) (*badger.DB, func(), error) {
-	return badger.NewDB(config.Dir)
-}
-
-type PipeConfig struct {
-	Welcome string
-}
-
-func providePipeConfig(msg WelcomeMessage) *PipeConfig {
-	return &PipeConfig{Welcome: string(msg)}
-}
-
-func newPipeFromConfig(sw store.IWorkspace, wwc workspace.IWorkspaceConnection, ww workspace.IWorkspace, cl *domain.ConnectionLimiter, config *PipeConfig) *service.Pipe {
-	return service.NewPipe(sw, wwc, ww, cl, config.Welcome)
-}
-
-type UserConfig struct {
-	APIKey string
-}
-
-func provideUserConfig(key APIKey) *UserConfig {
-	return &UserConfig{APIKey: string(key)}
-}
-
-func newUserFromConfig(u *service.User, config *UserConfig) *api.User {
-	return api.NewUser(u, config.APIKey)
-}
-
 func InjectServer(
-	apiKey APIKey,
-	connectionLimiter *domain.ConnectionLimiter,
-	badgerDir BadgerDir,
-	maxConnPerUser int64,
+	apiKey api.Key,
+	badgerDir badger.Dir,
+	maxGlobalConnections service.MaxGlobalConnections,
+	maxConnPerUser docker.MaxConnectionsPerUser,
 	apiConfig api.Config,
-	welcome WelcomeMessage,
+	welcome service.WelcomeMessage,
 ) (*Server, func(), error) {
 	wire.Build(
 		NewServer,
 		api.NewAPI,
-		newUserFromConfig,
+		api.NewUser,
 		gomap.NewWorkspace,
-		newDBFromConfig,
+		badger.NewDB,
 		badger.NewTransaction,
 		badger.NewUser,
 		service.NewSetup,
 		service.NewUser,
-		newPipeFromConfig,
+		service.NewPipe,
 		ssh.NewSSH,
 		docker.NewWorkspace,
 		docker.NewWorkspaceConnection,
-		provideDBConfig,
-		providePipeConfig,
-		provideUserConfig,
 		transactionBind,
 		storeWorkspaceBind,
 		repositoryUserBind,

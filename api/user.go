@@ -12,17 +12,19 @@ import (
 	"github.com/mazrean/separated-webshell/service"
 )
 
+type Key string
+
 type User struct {
 	*service.User
 	*validator.Validate
 	apiKey string
 }
 
-func NewUser(u *service.User, apiKey string) *User {
+func NewUser(u *service.User, apiKey Key) *User {
 	return &User{
 		User:     u,
 		Validate: NewValidator(),
-		apiKey:   apiKey,
+		apiKey:   string(apiKey),
 	}
 }
 

@@ -97,7 +97,7 @@ func InjectServer(
 	connectionLimiter *domain.ConnectionLimiter,
 	badgerDir BadgerDir,
 	maxConnPerUser int64,
-	apiConfig api.APIConfig,
+	apiConfig api.Config,
 	welcome WelcomeMessage,
 ) (*Server, func(), error) {
 	wire.Build(

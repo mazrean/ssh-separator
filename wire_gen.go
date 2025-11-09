@@ -22,7 +22,7 @@ import (
 
 // Injectors from wire.go:
 
-func InjectServer(apiKey APIKey, connectionLimiter *domain.ConnectionLimiter, badgerDir BadgerDir, maxConnPerUser int64, apiConfig api.APIConfig, welcome WelcomeMessage) (*Server, func(), error) {
+func InjectServer(apiKey APIKey, connectionLimiter *domain.ConnectionLimiter, badgerDir BadgerDir, maxConnPerUser int64, apiConfig api.Config, welcome WelcomeMessage) (*Server, func(), error) {
 	workspace, err := docker.NewWorkspace(maxConnPerUser)
 	if err != nil {
 		return nil, nil, err

@@ -56,7 +56,7 @@ func main() {
 	)
 
 	// Set Docker configuration
-	docker.SetConfig(docker.DockerConfig{
+	docker.SetConfig(docker.Config{
 		LocalImage:  config.Docker.LocalImage,
 		ImageName:   config.Docker.ImageName,
 		ImageUser:   config.Docker.ImageUser,
@@ -69,7 +69,7 @@ func main() {
 	connectionLimiter := domain.NewConnectionLimiter(config.Connection.MaxTotal)
 
 	// Create API configuration
-	apiConfig := api.APIConfig{
+	apiConfig := api.Config{
 		Prometheus:         config.Prometheus,
 		RateLimitRate:      config.RateLimit.Rate,
 		RateLimitBurst:     config.RateLimit.Burst,

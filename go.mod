@@ -3,6 +3,8 @@ module github.com/mazrean/separated-webshell
 go 1.24.0
 
 require (
+	github.com/alecthomas/kong v1.12.1
+	github.com/containerd/errdefs v1.0.0
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/gliderlabs/ssh v0.3.8
@@ -18,12 +20,10 @@ require (
 
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
-	github.com/alecthomas/kong v1.12.1 // indirect
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -72,6 +72,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
+	go.uber.org/mock v0.6.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/mod v0.28.0 // indirect
 	golang.org/x/net v0.45.0 // indirect
@@ -85,4 +86,9 @@ require (
 	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.1.0 // indirect
+)
+
+tool (
+	github.com/google/wire/cmd/wire
+	go.uber.org/mock/mockgen
 )

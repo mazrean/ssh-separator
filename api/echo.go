@@ -12,7 +12,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-type APIConfig struct {
+type Config struct {
 	Prometheus         bool
 	RateLimitRate      int
 	RateLimitBurst     int
@@ -21,12 +21,12 @@ type APIConfig struct {
 
 type API struct {
 	*User
-	config APIConfig
+	config Config
 }
 
-func NewAPI(user *User, config APIConfig) *API {
+func NewAPI(user *User, config Config) *API {
 	return &API{
-		User: user,
+		User:   user,
 		config: config,
 	}
 }

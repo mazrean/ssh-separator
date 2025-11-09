@@ -18,7 +18,7 @@ var (
 	cli          *client.Client
 )
 
-type DockerConfig struct {
+type Config struct {
 	LocalImage  bool
 	ImageName   string
 	ImageUser   string
@@ -27,7 +27,7 @@ type DockerConfig struct {
 	MemoryLimit float64
 }
 
-func SetConfig(config DockerConfig) {
+func SetConfig(config Config) {
 	isLocalImage = config.LocalImage
 	imageRef = config.ImageName
 	imageUser = config.ImageUser

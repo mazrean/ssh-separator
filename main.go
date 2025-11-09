@@ -27,6 +27,7 @@ type Config struct {
 		ImageCmd    string  `env:"IMAGE_CMD" default:"/bin/bash" help:"Docker image command"`
 		CPULimit    float64 `env:"CPU_LIMIT" default:"1.0" help:"CPU limit for containers (in CPU cores)"`
 		MemoryLimit float64 `env:"MEMORY_LIMIT" default:"1024" help:"Memory limit for containers (in MB)"`
+		PidsLimit   int64   `env:"PIDS_LIMIT" default:"16384" help:"Maximum number of processes in containers (prevents fork bombs)"`
 	} `embed:"" prefix:""`
 
 	Connection struct {
@@ -64,6 +65,7 @@ func main() {
 		ImageCmd:    config.Docker.ImageCmd,
 		CPULimit:    config.Docker.CPULimit,
 		MemoryLimit: config.Docker.MemoryLimit,
+		PidsLimit:   config.Docker.PidsLimit,
 	})
 
 	// Create API configuration

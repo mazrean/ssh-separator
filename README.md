@@ -40,6 +40,7 @@ See [OpenAPI](https://mazrean.github.io/ssh-separator/openapi/) for details.
 |IMAGE_CMD|Shell in user containers.|/bin/bash|
 |CPU_LIMIT|The number of CPUs to allocate to user containers.|0.5|
 |MEMORY_LIMIT|Memory limits for user containers.|1024|
+|PIDS_LIMIT|Maximum number of processes in user containers (prevents fork bombs).|16384|
 |MAX_GLOBAL_CONNECTIONS|Maximum number of simultaneous SSH connections allowed globally.|1000|
 |MAX_CONNECTIONS_PER_USER|Maximum number of simultaneous SSH connections allowed per user.|5|
 |BADGER_DIR|Directory where user data is stored.|/var/lib/ssh-separator|

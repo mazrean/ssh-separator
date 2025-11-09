@@ -23,6 +23,7 @@ var (
 	stopTimeout           = 10
 	cpuLimit              int64
 	memoryLimit           int64
+	pidsLimit             int64
 	maxConnectionsPerUser int64
 )
 
@@ -51,8 +52,9 @@ func (w *Workspace) Create(ctx context.Context, userName values.UserName) (*doma
 		Tty:   true,
 	}, &container.HostConfig{
 		Resources: container.Resources{
-			NanoCPUs: cpuLimit,
-			Memory:   memoryLimit,
+			NanoCPUs:  cpuLimit,
+			Memory:    memoryLimit,
+			PidsLimit: &pidsLimit,
 		},
 	}, nil, nil, ctnName)
 	if errdefs.IsConflict(err) {
@@ -122,8 +124,9 @@ func (w *Workspace) Recreate(ctx context.Context, workspace *domain.Workspace) (
 		Tty:   true,
 	}, &container.HostConfig{
 		Resources: container.Resources{
-			NanoCPUs: cpuLimit,
-			Memory:   memoryLimit,
+			NanoCPUs:  cpuLimit,
+			Memory:    memoryLimit,
+			PidsLimit: &pidsLimit,
 		},
 	}, nil, nil, ctnName)
 	if err != nil {

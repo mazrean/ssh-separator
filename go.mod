@@ -3,7 +3,7 @@ module github.com/mazrean/separated-webshell
 go 1.24.0
 
 require (
-	github.com/alecthomas/kong v1.13.0
+	github.com/alecthomas/kong v1.14.0
 	github.com/containerd/errdefs v1.0.0
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/docker/docker v28.5.2+incompatible

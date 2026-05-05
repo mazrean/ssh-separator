@@ -1,0 +1,8 @@
+name: ssh-separator
+version: 0.1.0
+description: SSH connection separator / multiplexer (Go server, wire-based DI).
+
+dependencies:
+  apm:
+    - mazrean/apm-plackage/common
+    - mazrean/apm-plackage/go

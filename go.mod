@@ -8,7 +8,7 @@ require (
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/gliderlabs/ssh v0.3.8
-	github.com/go-playground/validator/v10 v10.30.2
+	github.com/go-playground/validator/v10 v10.30.3
 	github.com/google/wire v0.7.0
 	github.com/labstack/echo/v4 v4.15.4
 	github.com/prometheus/client_golang v1.23.2

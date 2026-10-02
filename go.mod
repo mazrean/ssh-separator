@@ -10,7 +10,7 @@ require (
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/google/wire v0.7.0
-	github.com/labstack/echo/v4 v4.15.4
+	github.com/labstack/echo/v4 v4.16.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/stretchr/testify v1.12.1
 	go.uber.org/mock v0.6.0
